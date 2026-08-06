@@ -386,6 +386,22 @@ const CURATED = [
   {id:'rock',     title:'Rock Internacional',sub:'Guitarra na veia',             emoji:'🤘', grad:'linear-gradient(135deg,#3a3a3a,#e50914)', q:'classic rock greatest hits'},
 ];
 
+/* Playlists prontas por artista */
+const ARTISTS = [
+  {id:'ar_beyonce',  title:'Beyoncé',              sub:'As mais tocadas', emoji:'👑', grad:'linear-gradient(135deg,#c31432,#240b36)', q:'Beyoncé greatest hits'},
+  {id:'ar_chris',    title:'Chris Brown',          sub:'As mais tocadas', emoji:'🎤', grad:'linear-gradient(135deg,#1f1c2c,#928dab)', q:'Chris Brown greatest hits'},
+  {id:'ar_50cent',   title:'50 Cent',              sub:'As mais tocadas', emoji:'💰', grad:'linear-gradient(135deg,#0f0c29,#302b63)', q:'50 Cent greatest hits'},
+  {id:'ar_mj',       title:'Michael Jackson',      sub:'O Rei do Pop',    emoji:'🕺', grad:'linear-gradient(135deg,#e50914,#000000)', q:'Michael Jackson greatest hits'},
+  {id:'ar_rem',      title:'R.E.M.',               sub:'As mais tocadas', emoji:'🎸', grad:'linear-gradient(135deg,#134e5e,#71b280)', q:'R.E.M. greatest hits'},
+  {id:'ar_roberto',  title:'Roberto Carlos',       sub:'Sucessos',        emoji:'🎶', grad:'linear-gradient(135deg,#8e0e00,#1f1c18)', q:'Roberto Carlos as melhores'},
+  {id:'ar_engenheiros',title:'Engenheiros do Hawaii',sub:'Rock nacional', emoji:'🇧🇷', grad:'linear-gradient(135deg,#004e92,#000428)', q:'Engenheiros do Hawaii as melhores'},
+  {id:'ar_u2',       title:'U2',                   sub:'As mais tocadas', emoji:'🌍', grad:'linear-gradient(135deg,#cc2b5e,#753a88)', q:'U2 greatest hits'},
+  {id:'ar_keane',    title:'Keane',                sub:'As mais tocadas', emoji:'🎹', grad:'linear-gradient(135deg,#2b5876,#4e4376)', q:'Keane greatest hits'},
+  {id:'ar_aha',      title:'a-ha',                 sub:'Anos 80',         emoji:'📼', grad:'linear-gradient(135deg,#396afc,#2948ff)', q:'a-ha greatest hits'},
+];
+/* localiza uma coleção pronta (estilo ou artista) por id */
+function findCollection(id){ return CURATED.find(x=>x.id===id) || ARTISTS.find(x=>x.id===id); }
+
 const state = {
   view:'home',
   home:[], results:[],
@@ -547,15 +563,19 @@ function emptyView(kind){
 
 /* ---------- views principais ---------- */
 /* grade de estilos (playlists) mostrada no topo da página inicial */
-function stylesGridHtml(){
-  const cards=CURATED.map(p=>`
-    <div class="plcard" style="background:${p.grad}" data-curated="${p.id}">
+function cardHtml(p){
+  return `<div class="plcard" style="background:${p.grad}" data-curated="${p.id}">
       <span class="emoji">${p.emoji}</span>
       <div class="pltitle">${p.title}</div>
       <div class="plsub">${p.sub}</div>
-    </div>`).join('');
-  return `<div class="section-title"><span class="dot"></span>Estilos & playlists</div>
-    <div class="grid">${cards}</div>`;
+    </div>`;
+}
+function gridSection(label,list){
+  return `<div class="section-title"><span class="dot"></span>${label}</div>
+    <div class="grid">${list.map(cardHtml).join('')}</div>`;
+}
+function stylesGridHtml(){
+  return gridSection('Estilos & playlists',CURATED)+gridSection('Artistas',ARTISTS);
 }
 async function showHome(){
   state.view='home'; state.currentUserPl=null;
@@ -692,25 +712,19 @@ function showPlaylists(){
       <div class="pltitle">${esc(p.name)}</div>
       <div class="plsub">${p.tracks.length} faixa${p.tracks.length===1?'':'s'}</div>
     </div>`).join('');
-  const curated = CURATED.map(p=>`
-    <div class="plcard" style="background:${p.grad}" data-curated="${p.id}">
-      <span class="emoji">${p.emoji}</span>
-      <div class="pltitle">${p.title}</div>
-      <div class="plsub">${p.sub}</div>
-    </div>`).join('');
   content.innerHTML=`
     <div class="section-title"><span class="dot"></span>Suas playlists</div>
     <div class="grid">
       <div class="plcard new" id="newPl"><div class="plus">+</div><div>Nova playlist</div></div>
       ${mine}
     </div>
-    <div class="section-title"><span class="dot"></span>Descobrir por estilo</div>
-    <div class="grid">${curated}</div>`;
+    ${gridSection('Artistas',ARTISTS)}
+    ${gridSection('Descobrir por estilo',CURATED)}`;
 }
 
-/* abrir playlist curada */
+/* abrir playlist curada (estilo ou artista) */
 async function openCurated(id){
-  const p=CURATED.find(x=>x.id===id); if(!p) return; state.currentUserPl=null;
+  const p=findCollection(id); if(!p) return; state.currentUserPl=null;
   const head=headHtml(p.title, p.sub);
   if(state.cache[id]){ renderTracks(state.cache[id], p.title, {headHtml:head, mini:`${state.cache[id].length} faixas`, playall:true, curatedId:id}); wireHead(); return; }
   content.innerHTML=head+`<div class="skeleton" style="padding:40px;justify-content:center"><div class="sk" style="width:34px;height:34px;border-radius:50%"></div></div>`;
