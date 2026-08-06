@@ -5,6 +5,7 @@ on:
     branches: [ "claude/transform-apk-qzr6w7" ]
     paths-ignore:
       - "**/*.md"
+      - ".github/workflows/**"
   workflow_dispatch: {}
 
 permissions:

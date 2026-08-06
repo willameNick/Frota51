@@ -1,0 +1,27 @@
+name: Cleanup old Frota releases
+
+on:
+  push:
+    branches: [ "claude/transform-apk-qzr6w7" ]
+    paths:
+      - ".github/workflows/cleanup-releases.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete leftover Frota releases and tags
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          for tag in apk-build-1 apk-build-2; do
+            echo "Removendo release/tag $tag ..."
+            gh release delete "$tag" --repo "$REPO" --cleanup-tag --yes || echo "  (já não existe)"
+          done
+          echo "Releases restantes:"
+          gh release list --repo "$REPO"
