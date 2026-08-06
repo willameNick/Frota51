@@ -44,21 +44,21 @@ jobs:
           ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Rename APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk Frota.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk GiMusic.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Frota-apk
-          path: Frota.apk
+          name: GiMusic-apk
+          path: GiMusic.apk
           if-no-files-found: error
 
       - name: Publish APK to a Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: apk-build-${{ github.run_number }}
-          name: Frota APK (build ${{ github.run_number }})
-          files: Frota.apk
+          name: GiMusic APK (build ${{ github.run_number }})
+          files: GiMusic.apk
           body: |
-            Debug APK do app **Frota** gerado automaticamente a partir do PWA (Capacitor).
-            Baixe `Frota.apk` abaixo e instale no Android (permita "fontes desconhecidas").
+            Debug APK do app **GiMusic** gerado automaticamente a partir do PWA (Capacitor).
+            Baixe `GiMusic.apk` abaixo e instale no Android (permita "fontes desconhecidas").

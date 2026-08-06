@@ -1,6 +1,6 @@
 {
-  "appId": "br.com.frota.app",
-  "appName": "Frota",
+  "appId": "com.gimusic.app",
+  "appName": "GiMusic",
   "webDir": "www",
   "server": {
     "androidScheme": "https"

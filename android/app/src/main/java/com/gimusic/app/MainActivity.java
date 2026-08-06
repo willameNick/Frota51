@@ -1,4 +1,4 @@
-package br.com.frota.app;
+package com.gimusic.app;
 
 import com.getcapacitor.BridgeActivity;
 

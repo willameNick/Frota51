@@ -44,12 +44,12 @@ jobs:
             echo "::error::Secret KEYSTORE_BASE64 nao configurado. Veja BUILD_APK.md."
             exit 1
           fi
-          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/frota-release.keystore"
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/gimusic-release.keystore"
 
       - name: Build signed AAB and APK
         working-directory: android
         env:
-          RELEASE_STORE_FILE: ${{ runner.temp }}/frota-release.keystore
+          RELEASE_STORE_FILE: ${{ runner.temp }}/gimusic-release.keystore
           RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -59,28 +59,28 @@ jobs:
 
       - name: Collect artifacts
         run: |
-          cp android/app/build/outputs/bundle/release/app-release.aab Frota-release.aab
-          cp android/app/build/outputs/apk/release/app-release.apk Frota-release.apk
-          ls -la Frota-release.*
+          cp android/app/build/outputs/bundle/release/app-release.aab GiMusic-release.aab
+          cp android/app/build/outputs/apk/release/app-release.apk GiMusic-release.apk
+          ls -la GiMusic-release.*
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Frota-release
+          name: GiMusic-release
           path: |
-            Frota-release.aab
-            Frota-release.apk
+            GiMusic-release.aab
+            GiMusic-release.apk
           if-no-files-found: error
 
       - name: Publish to a Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: release-${{ github.run_number }}
-          name: Frota Release assinado (build ${{ github.run_number }})
+          name: GiMusic Release assinado (build ${{ github.run_number }})
           files: |
-            Frota-release.aab
-            Frota-release.apk
+            GiMusic-release.aab
+            GiMusic-release.apk
           body: |
-            Build **assinado de release** do app Frota.
-            - `Frota-release.aab` → suba na Google Play Console.
-            - `Frota-release.apk` → instalação direta assinada com a chave de release.
+            Build **assinado de release** do app GiMusic.
+            - `GiMusic-release.aab` → suba na Google Play Console.
+            - `GiMusic-release.apk` → instalação direta assinada com a chave de release.

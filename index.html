@@ -1,1614 +1,796 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
-<title>Frota — Gestão de Frotas e Oficina</title>
-<link rel="manifest" href="manifest.json"/>
-<meta name="theme-color" content="#0b2545"/>
-<link rel="icon" href="icons/icon-192.png"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>GiMusic · música sem anúncios</title>
 <style>
-:root{
-  --navy:#0b2545; --navy2:#123a6b; --blue:#2f6fdb; --gray:#f3f5f8; --line:#e3e8ef;
-  --text:#1f2937; --muted:#6b7280; --white:#fff;
-  --ok:#1a9c63; --warn:#e0a721; --bad:#d64545; --info:#2f6fdb;
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--gray);color:var(--text);}
-#app{max-width:1200px;margin:0 auto;padding-bottom:70px;}
-header.top{background:var(--navy);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:20;
-  display:flex;align-items:center;justify-content:space-between;}
-header.top h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.3px}
-header.top .sub{font-size:11px;opacity:.75;margin-top:2px}
-.badge-perfil{background:rgba(255,255,255,.14);border-radius:20px;padding:5px 10px;font-size:11px;cursor:pointer;white-space:nowrap}
-.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
-.dot.on{background:#3ddc84}.dot.off{background:#e0a721}
-main{padding:14px}
-.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
-.grid{display:grid;gap:10px}
-.kpi-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
-.kpi{background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:12px}
-.kpi.ok{border-left-color:var(--ok)} .kpi.warn{border-left-color:var(--warn)} .kpi.bad{border-left-color:var(--bad)}
-.kpi .n{font-size:24px;font-weight:800;color:var(--navy)}
-.kpi .l{font-size:11.5px;color:var(--muted);margin-top:2px}
-h2.sec{font-size:14px;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin:18px 0 8px}
-.banner{background:#fff4d6;border:1px solid #f0d792;color:#7a5b06;padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:12px}
-.banner.bad{background:#fde2e2;border-color:#f3b7b7;color:#8a1f1f}
-button{cursor:pointer;font-family:inherit}
-.btn{background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13.5px;font-weight:600}
-.btn.sec{background:#fff;color:var(--navy);border:1px solid var(--navy)}
-.btn.sm{padding:6px 10px;font-size:12px;border-radius:6px}
-.btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--line)}
-.btn.danger{background:var(--bad)}
-input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;background:#fff}
-label{font-size:12px;color:var(--muted);display:block;margin:8px 0 4px;font-weight:600}
-.row{display:flex;gap:8px;flex-wrap:wrap}
-.row > *{flex:1;min-width:120px}
-.list-item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
-.list-item:last-child{border-bottom:none}
-.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
-.pill.disponivel{background:#e3f6ec;color:var(--ok)}
-.pill.bloqueado,.pill.sinistro{background:#fde2e2;color:var(--bad)}
-.pill.oficina_interna,.pill.oficina_externa,.pill.aguardando_peca,.pill.aguardando_orcamento{background:#fdf1d6;color:#916a05}
-.pill.em_rota,.pill.preventiva_programada{background:#e6eefc;color:var(--blue)}
-.pill.inativo,.pill.vendido{background:#eee;color:#777}
-.tabs-bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
-  display:flex;justify-content:space-around;padding:6px 2px;z-index:30;max-width:1200px;margin:0 auto}
-.tabs-bottom button{background:none;border:none;font-size:10.5px;color:var(--muted);display:flex;flex-direction:column;
-  align-items:center;gap:2px;padding:5px 2px;flex:1}
-.tabs-bottom button.active{color:var(--navy);font-weight:700}
-.tabs-bottom .ic{font-size:18px}
-.modal-bg{position:fixed;inset:0;background:rgba(11,37,69,.55);z-index:100;display:flex;align-items:flex-end;justify-content:center}
-.modal{background:#fff;border-radius:16px 16px 0 0;max-width:600px;width:100%;max-height:92vh;overflow:auto;padding:16px}
-.modal h3{margin:0 0 10px;color:var(--navy)}
-.close-x{float:right;background:none;border:none;font-size:20px;color:var(--muted)}
-table.simple{width:100%;border-collapse:collapse;font-size:13px}
-table.simple th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:6px 4px;border-bottom:2px solid var(--line)}
-table.simple td{padding:8px 4px;border-bottom:1px solid var(--line)}
-.chk-grupo{margin-bottom:14px}
-.chk-grupo h4{font-size:13px;color:var(--navy2);margin:0 0 6px}
-.chk-item{border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:6px}
-.chk-item .nome{font-size:13.5px;font-weight:600;margin-bottom:6px}
-.opts{display:flex;gap:5px;flex-wrap:wrap}
-.opt{border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:11.5px;background:#fff;cursor:pointer}
-.opt.sel-conforme{background:#1a9c63;color:#fff;border-color:#1a9c63}
-.opt.sel-nc_leve{background:#f0d792;color:#5a4300;border-color:#f0d792}
-.opt.sel-nc_moderada{background:#e0a721;color:#fff;border-color:#e0a721}
-.opt.sel-critica{background:#d64545;color:#fff;border-color:#d64545}
-.opt.sel-na{background:#e5e7eb;color:#444;border-color:#e5e7eb}
-.kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
-.kcol{min-width:230px;background:#eef1f6;border-radius:10px;padding:8px;flex-shrink:0}
-.kcol h4{font-size:11.5px;color:var(--navy);text-transform:uppercase;margin:2px 4px 8px;display:flex;justify-content:space-between}
-.kcard{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:8px;font-size:12.5px;cursor:pointer}
-.kcard .p{font-weight:700;color:var(--navy)}
-.kcard .atraso{color:var(--bad);font-weight:700}
-.sync-toast{position:fixed;top:8px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;
-  padding:6px 14px;border-radius:20px;font-size:12px;z-index:200}
-.photo-thumb{width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--line);margin:4px 4px 0 0}
-.accordion h4{background:#eef1f6;padding:9px 10px;border-radius:8px;margin:8px 0 0;font-size:13px;color:var(--navy2);cursor:pointer}
-.accordion .body{padding:8px 4px}
-.hidden{display:none !important}
-.small{font-size:11.5px;color:var(--muted)}
-.timeline-item{border-left:2px solid var(--line);padding:2px 0 10px 12px;position:relative;font-size:12.5px}
-.timeline-item::before{content:'';width:8px;height:8px;background:var(--blue);border-radius:50%;position:absolute;left:-5px;top:4px}
+  :root{
+    --bg:#0a0a0a; --bg2:#141414; --card:#1b1b1b; --card-h:#242424;
+    --red:#e50914; --red-soft:#ff2b36; --txt:#f2f2f2; --dim:#9a9a9a; --line:#2a2a2a;
+    --player-h:88px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    background:radial-gradient(1200px 600px at 50% -10%, #1a0406 0%, var(--bg) 55%) fixed;
+    color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding-bottom:calc(var(--player-h) + env(safe-area-inset-bottom));
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+
+  header{
+    position:sticky; top:0; z-index:20;
+    background:linear-gradient(180deg, rgba(10,10,10,.96), rgba(10,10,10,.82) 70%, transparent);
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--red),#7a0509);
+    display:grid;place-items:center;box-shadow:0 4px 18px rgba(229,9,20,.45)}
+  .logo svg{width:18px;height:18px;fill:#fff}
+  .brand h1{font-size:19px;font-weight:800;letter-spacing:.3px}
+  .brand h1 span{color:var(--red-soft)}
+  .brand .tag{margin-left:auto;font-size:10px;color:var(--dim);border:1px solid var(--line);
+    padding:4px 8px;border-radius:20px}
+
+  .search{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:11px 14px;transition:border-color .2s}
+  .search:focus-within{border-color:var(--red)}
+  .search svg{width:18px;height:18px;fill:var(--dim);flex:none}
+  .search input{flex:1;background:none;border:none;outline:none;color:var(--txt);font-size:15px}
+  .search input::placeholder{color:var(--dim)}
+
+  nav.tabs{display:flex;gap:8px;padding:12px 16px 4px;overflow-x:auto;scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar{display:none}
+  .tab{white-space:nowrap;padding:8px 16px;border-radius:20px;background:var(--card);
+    color:var(--dim);font-size:13px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:.15s}
+  .tab.active{background:var(--red);color:#fff;box-shadow:0 4px 14px rgba(229,9,20,.4)}
+
+  main{padding:6px 16px 20px;max-width:860px;margin:0 auto}
+  .section-title{font-size:15px;font-weight:700;margin:16px 2px 10px;display:flex;align-items:center;gap:8px}
+  .section-title .dot{width:6px;height:6px;border-radius:50%;background:var(--red)}
+  .section-title .mini{margin-left:auto;font-size:12px;color:var(--dim);font-weight:600}
+
+  .list{display:flex;flex-direction:column;gap:4px}
+  .row{display:flex;align-items:center;gap:11px;padding:8px;border-radius:12px;cursor:pointer;
+    transition:background .15s;position:relative}
+  .row:hover{background:var(--card)}
+  .row.active{background:var(--card-h)}
+  .row.active .rtitle{color:var(--red-soft)}
+  .art{width:50px;height:50px;border-radius:9px;object-fit:cover;flex:none;background:var(--card-h)}
+  .rinfo{flex:1;min-width:0}
+  .rtitle{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rartist{font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+  .rdur{font-size:12px;color:var(--dim);flex:none;font-variant-numeric:tabular-nums;margin:0 2px}
+  .iconbtn{flex:none;background:none;border:none;cursor:pointer;padding:6px;display:grid;place-items:center}
+  .iconbtn svg{width:19px;height:19px;fill:none;stroke:var(--dim);stroke-width:2;transition:.15s}
+  .iconbtn.heart.on svg{fill:var(--red);stroke:var(--red)}
+  .iconbtn.add svg{stroke:var(--dim)}
+  .iconbtn:hover svg{stroke:var(--txt)}
+  .iconbtn.more svg{fill:var(--dim);stroke:none}
+  .iconbtn.more:hover svg{fill:var(--txt);stroke:none}
+  .sheetdiv{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);
+    padding:14px 8px 6px;border-top:1px solid var(--line);margin-top:8px}
+  .num{width:20px;text-align:center;color:var(--dim);font-size:13px;flex:none;font-variant-numeric:tabular-nums}
+  .row.active .num{color:var(--red)}
+
+  /* Grid de playlists */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(min-width:560px){.grid{grid-template-columns:1fr 1fr 1fr}}
+  .plcard{border-radius:16px;padding:14px;min-height:118px;position:relative;overflow:hidden;cursor:pointer;
+    display:flex;flex-direction:column;justify-content:flex-end;transition:transform .12s;
+    box-shadow:0 6px 20px rgba(0,0,0,.35)}
+  .plcard:active{transform:scale(.97)}
+  .plcard .emoji{font-size:26px;position:absolute;top:12px;left:14px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+  .plcard .pltitle{font-size:15px;font-weight:800;position:relative;z-index:2;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+  .plcard .plsub{font-size:11px;opacity:.9;margin-top:2px;position:relative;z-index:2;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+  .plcard.new{background:var(--card);border:1.5px dashed var(--line);align-items:center;justify-content:center;
+    color:var(--dim);text-align:center}
+  .plcard.new .plus{font-size:28px;line-height:1;margin-bottom:6px;color:var(--red)}
+  .plcard.mine{background:linear-gradient(135deg,#2a2a2a,#161616)}
+  .plcard.mine .cnt{position:absolute;top:12px;right:14px;font-size:11px;color:var(--dim);z-index:2}
+
+  /* Cabeçalho de detalhe da playlist */
+  .plhead{display:flex;align-items:center;gap:12px;margin:8px 0 14px}
+  .backbtn{background:var(--card);border:1px solid var(--line);border-radius:50%;width:38px;height:38px;
+    display:grid;place-items:center;cursor:pointer;flex:none}
+  .backbtn svg{width:20px;height:20px;fill:var(--txt)}
+  .plhead .htitle{flex:1;min-width:0}
+  .plhead .htitle h2{font-size:20px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .plhead .htitle p{font-size:12px;color:var(--dim);margin-top:2px}
+  .playall{background:var(--red);border:none;border-radius:24px;color:#fff;font-weight:700;font-size:13px;
+    padding:10px 18px;cursor:pointer;display:flex;align-items:center;gap:6px;flex:none}
+  .playall svg{width:16px;height:16px;fill:#fff}
+  .trash{background:none;border:none;cursor:pointer;padding:8px;flex:none}
+  .trash svg{width:20px;height:20px;fill:var(--dim)}
+
+  .empty{text-align:center;color:var(--dim);padding:56px 20px}
+  .empty svg{width:52px;height:52px;fill:var(--line);margin-bottom:14px}
+  .empty p{font-size:14px;line-height:1.5}
+  .skeleton{display:flex;align-items:center;gap:12px;padding:8px}
+  .sk{background:linear-gradient(90deg,var(--card) 25%,var(--card-h) 50%,var(--card) 75%);
+    background-size:200% 100%;animation:sh 1.2s infinite;border-radius:8px}
+  @keyframes sh{to{background-position:-200% 0}}
+
+  /* Player */
+  .player{position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:linear-gradient(180deg,var(--bg2),#0d0d0d);border-top:1px solid var(--line);
+    padding:0 14px calc(10px + env(safe-area-inset-bottom));
+    transform:translateY(120%);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+  .player.show{transform:translateY(0)}
+  .progress{padding:8px 0 6px}
+  .bar{height:5px;background:var(--line);border-radius:3px;position:relative;cursor:pointer}
+  .bar-buf{position:absolute;top:0;left:0;height:100%;background:#333;border-radius:3px;width:0%}
+  .bar-fill{position:relative;z-index:2;height:100%;background:linear-gradient(90deg,var(--red),var(--red-soft));border-radius:3px;width:0%}
+  .knob{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:#fff;
+    transform:translate(-50%,-50%);left:0%;z-index:3;box-shadow:0 1px 4px rgba(0,0,0,.5);opacity:0;transition:opacity .15s}
+  .bar:hover .knob{opacity:1}
+  .times{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:3px;font-variant-numeric:tabular-nums}
+  .pcontrols{display:flex;align-items:center;gap:12px;padding-bottom:8px}
+  .pmeta{display:flex;align-items:center;gap:11px;flex:1;min-width:0}
+  .part{width:46px;height:46px;border-radius:8px;object-fit:cover;flex:none;background:var(--card-h)}
+  .pinfo{min-width:0;flex:1}
+  .ptitle{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .partist{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .btns{display:flex;align-items:center;gap:6px;flex:none}
+  .ic{background:none;border:none;cursor:pointer;color:var(--txt);display:grid;place-items:center;
+    width:40px;height:40px;border-radius:50%;transition:.15s}
+  .ic:hover{background:var(--card-h)}
+  .ic svg{width:22px;height:22px;fill:currentColor}
+  .ic.play{background:var(--red);width:48px;height:48px}
+  .ic.play:hover{background:var(--red-soft);transform:scale(1.05)}
+  .ic.play svg{width:24px;height:24px;fill:#fff}
+  .ic.small svg{width:18px;height:18px}
+  .ic.fav svg{fill:none;stroke:currentColor;stroke-width:2}
+  .ic.fav.on{color:var(--red)}
+  .ic.fav.on svg{fill:var(--red);stroke:var(--red)}
+  .ic:disabled{opacity:.35;cursor:default;background:none;transform:none}
+
+  /* Painel de letra */
+  .lyrics{position:fixed;inset:0;z-index:55;background:radial-gradient(900px 500px at 50% -5%,#25060a,#0a0a0a 60%);
+    transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
+  .lyrics.show{transform:translateY(0)}
+  .lyrics-bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;
+    filter:blur(30px) brightness(.42) saturate(1.15);transform:scale(1.18);opacity:0;transition:opacity .5s}
+  .lyrics-bg.show{opacity:1}
+  .lyrics-scrim{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(10,10,10,.5),rgba(10,10,10,.8))}
+  .lyrics-head,.lyrics-body{position:relative;z-index:2}
+  .lyrics-head{display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top)) 16px 12px;border-bottom:1px solid var(--line)}
+  .lyrics-head .close{background:var(--card);border:1px solid var(--line);border-radius:50%;width:38px;height:38px;display:grid;place-items:center;cursor:pointer;flex:none}
+  .lyrics-head .close svg{width:22px;height:22px;fill:var(--txt)}
+  .lyrics-head .lh{flex:1;min-width:0}
+  .lyrics-head h2{font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lyrics-head p{font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .lyrics-head .tbtn{background:var(--card);border:1px solid var(--line);border-radius:20px;min-width:44px;height:34px;color:var(--dim);font-weight:800;font-size:12px;cursor:pointer;display:none;place-items:center;padding:0 12px;flex:none}
+  .lyrics-head .tbtn.on{background:var(--red);border-color:var(--red);color:#fff}
+  .lyrics-body{flex:1;overflow:hidden;display:flex;min-height:0}
+  .pane{flex:1;overflow-y:auto;padding:8px 20px 45vh;min-width:0}
+  .pane+.pane{border-left:1px solid var(--line)}
+  .plabel{position:sticky;top:0;background:linear-gradient(180deg,rgba(10,10,10,.92),transparent);
+    font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--red-soft);padding:8px 0 10px;z-index:2}
+  .line{font-size:18px;line-height:1.5;color:var(--dim);padding:6px 0;opacity:.5;transition:opacity .25s,color .25s}
+  .pane.plain .line{opacity:.92}
+  .line.active{opacity:1;color:#fff;font-weight:700}
+  .pane.trans .line.active{color:var(--red-soft)}
+  .lyrics-empty{margin:auto;text-align:center;color:var(--dim);padding:30px}
+  .lyrics-empty svg{width:46px;height:46px;fill:var(--line);margin-bottom:14px}
+  .lyrics-empty small{color:#6a6a6a}
+  .lyrichint{width:16px;height:16px;fill:var(--dim);flex:none;opacity:.7}
+  .pmeta{cursor:pointer}
+  .spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media(max-width:559px){
+    .lyrics-body{flex-direction:column}
+    .pane+.pane{border-left:none;border-top:1px solid var(--line)}
+    .pane{padding-bottom:22vh}
+  }
+
+  /* Bottom sheet (add a playlist) */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
+  .overlay.show{opacity:1;pointer-events:auto}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:51;background:var(--bg2);border-top:1px solid var(--line);
+    border-radius:20px 20px 0 0;padding:8px 16px calc(20px + env(safe-area-inset-bottom));
+    transform:translateY(110%);transition:transform .28s cubic-bezier(.2,.8,.2,1);max-height:70vh;overflow-y:auto}
+  .sheet.show{transform:translateY(0)}
+  .sheet .grip{width:38px;height:4px;background:var(--line);border-radius:3px;margin:6px auto 12px}
+  .sheet h3{font-size:15px;font-weight:700;margin-bottom:4px;padding:0 4px}
+  .sheet .subh{font-size:12px;color:var(--dim);margin-bottom:12px;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sheetitem{display:flex;align-items:center;gap:12px;padding:12px 8px;border-radius:12px;cursor:pointer}
+  .sheetitem:hover{background:var(--card)}
+  .sheetitem .ico{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex:none;
+    background:linear-gradient(135deg,#2a2a2a,#161616);font-size:18px}
+  .sheetitem.newpl .ico{background:var(--red);color:#fff}
+  .sheetitem .txt{flex:1;min-width:0}
+  .sheetitem .txt b{font-size:14px;font-weight:600}
+  .sheetitem .txt small{font-size:11px;color:var(--dim);display:block;margin-top:1px}
+
+  .toast{position:fixed;bottom:calc(var(--player-h) + 20px);left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--card-h);color:var(--txt);padding:11px 18px;border-radius:24px;font-size:13px;
+    border:1px solid var(--line);opacity:0;pointer-events:none;transition:.25s;z-index:60;white-space:nowrap}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media(min-width:560px){:root{--player-h:82px}}
 </style>
 </head>
 <body>
-<div id="app">
-  <header class="top">
-    <div>
-      <h1>Frota</h1>
-      <div class="sub" id="hdrSub">Gestão Operacional</div>
+
+<header>
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></div>
+    <h1>Gi<span>Music</span></h1>
+    <div class="tag">sua música · sem anúncios</div>
+  </div>
+  <div class="search">
+    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.49 4.49 0 0 1 9.5 14z"/></svg>
+    <input id="q" type="text" placeholder="Buscar músicas, artistas..." autocomplete="off">
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <div class="tab active" data-view="home">Início</div>
+  <div class="tab" data-view="playlists">Playlists</div>
+  <div class="tab" data-view="search">Buscar</div>
+  <div class="tab" data-view="fav">Favoritos</div>
+</nav>
+
+<main id="content"></main>
+
+<div class="player" id="player">
+  <div class="progress">
+    <div class="bar" id="bar">
+      <div class="bar-buf" id="buf"></div>
+      <div class="bar-fill" id="fill"></div>
+      <div class="knob" id="knob"></div>
     </div>
-    <div class="badge-perfil" id="perfilBadge" onclick="UI.openPerfil()"><span class="dot off" id="netDot"></span>--</div>
-  </header>
-  <main id="main"></main>
-  <nav class="tabs-bottom" id="tabs"></nav>
+    <div class="times"><span id="cur">0:00</span><span id="dur">0:00</span></div>
+  </div>
+  <div class="pcontrols">
+    <div class="pmeta" id="pmeta">
+      <img class="part" id="part" alt="">
+      <div class="pinfo">
+        <div class="ptitle" id="ptitle">—</div>
+        <div class="partist" id="partist"></div>
+      </div>
+      <svg class="lyrichint" viewBox="0 0 24 24"><path d="M7 15l5-5 5 5z"/></svg>
+    </div>
+    <div class="btns">
+      <button class="ic fav" id="pfav" title="Favoritar">
+        <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.9-10-9.6C.4 8.2 1.9 4.5 5.2 4.1 7 3.9 8.7 4.8 12 8c3.3-3.2 5-4.1 6.8-3.9 3.3.4 4.8 4.1 3.2 7.3C19.5 16.1 12 21 12 21z"/></svg>
+      </button>
+      <button class="ic small" id="prev" title="Anterior">
+        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      </button>
+      <button class="ic play" id="play" title="Tocar">
+        <svg viewBox="0 0 24 24" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="ic small" id="next" title="Próxima">
+        <svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-9.5 6l8.5 6V6z" transform="scale(-1,1) translate(-24,0)"/></svg>
+      </button>
+    </div>
+  </div>
 </div>
-<div id="modalRoot"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="config.js"></script>
+<div class="lyrics" id="lyrics">
+  <div class="lyrics-bg" id="lyricsBg"></div>
+  <div class="lyrics-scrim"></div>
+  <div class="lyrics-head">
+    <button class="close" id="lyricsClose" title="Fechar"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></button>
+    <div class="lh"><h2 id="lyricsTitle">—</h2><p id="lyricsArtist"></p></div>
+    <button class="tbtn" id="transToggle" title="Mostrar/ocultar tradução">PT</button>
+  </div>
+  <div class="lyrics-body" id="lyricsBody"></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+<audio id="audio" preload="auto"></audio>
+
 <script>
-/* =========================================================
-   CONFIG
-   Os valores vêm de config.js (copie de config.example.js).
-   localStorage sobrescreve o arquivo — útil para testar sem
-   commitar nada. Ver README.md.
-========================================================= */
-const FILE_CFG = (typeof window !== 'undefined' && window.FROTA_CONFIG) ? window.FROTA_CONFIG : {};
+/* ============ GiMusic — música online legal, sem anúncios (Audius) ============ */
+const APP = 'GiMusic';
+let HOST = 'https://api.audius.co';
+const audio = document.getElementById('audio');
+const $ = id => document.getElementById(id);
 
-const DEFAULT_URL = FILE_CFG.supabaseUrl || '';
-const DEFAULT_KEY = FILE_CFG.supabaseKey || '';
+/* Playlists curadas — por gênero/estilo (conteúdo real e legal no Audius) */
+const CURATED = [
+  {id:'academia', title:'Academia',        sub:'Eletrônica pra treinar',       emoji:'🔥', grad:'linear-gradient(135deg,#e50914,#ff7a00)', type:'genre',  value:'Electronic'},
+  {id:'house',    title:'House & EDM',      sub:'Batida pra dançar',            emoji:'🎧', grad:'linear-gradient(135deg,#7b2ff7,#f107a3)', type:'search', value:'house'},
+  {id:'metal',    title:'Metal & Pesado',   sub:'Vibe SOAD · Linkin · Matanza', emoji:'🤘', grad:'linear-gradient(135deg,#3a3a3a,#e50914)', type:'genre',  value:'Metal'},
+  {id:'rock',     title:'Rock',             sub:'Guitarra na veia',             emoji:'🎸', grad:'linear-gradient(135deg,#41295a,#2f0743)', type:'genre',  value:'Rock'},
+  {id:'alt',      title:'Alternativo',      sub:'Indie & alt rock',             emoji:'🌘', grad:'linear-gradient(135deg,#0f2027,#2c5364)', type:'genre',  value:'Alternative'},
+  {id:'pop',      title:'Pop',              sub:'Hits e vibes',                 emoji:'✨', grad:'linear-gradient(135deg,#ff512f,#dd2476)', type:'genre',  value:'Pop'},
+  {id:'hiphop',   title:'Hip-Hop',          sub:'Rap & beats',                  emoji:'🎤', grad:'linear-gradient(135deg,#141e30,#243b55)', type:'genre',  value:'Hip-Hop/Rap'},
+  {id:'latin',    title:'Latin',            sub:'Salsa, reggaeton & cia',       emoji:'💃', grad:'linear-gradient(135deg,#f7971e,#ffd200)', type:'genre',  value:'Latin'},
+  {id:'funkbr',   title:'Funk Brasil',      sub:'Batidão nacional',             emoji:'🇧🇷', grad:'linear-gradient(135deg,#009e3c,#ffcb05)', type:'search', value:'funk brasil'},
+  {id:'samba',    title:'Samba & Pagode',   sub:'Raiz brasileira',              emoji:'🥁', grad:'linear-gradient(135deg,#00b09b,#96c93d)', type:'search', value:'samba'},
+  {id:'sertanejo',title:'Sertanejo',        sub:'Modão e mais',                 emoji:'🤠', grad:'linear-gradient(135deg,#8e2de2,#4a00e0)', type:'search', value:'sertanejo'},
+];
 
-// Dados de recebimento — cobrança manual via PIX.
-// NUNCA commite dados bancários reais em repositório público.
-const PIX = Object.assign(
-  { chave: '', titular: '', instituicao: '', banco: '', agencia: '', conta: '' },
-  FILE_CFG.pix || {},
-  (function(){ try { return JSON.parse(localStorage.getItem('dpl_pix') || '{}'); } catch(e){ return {}; } })()
-);
-
-const CFG = {
-  url: localStorage.getItem('dpl_sb_url') || DEFAULT_URL,
-  key: localStorage.getItem('dpl_sb_key') || DEFAULT_KEY,
-  frotaOficial: parseInt(localStorage.getItem('dpl_frota_oficial') || FILE_CFG.frotaOficial || '60', 10)
+const state = {
+  view:'home',
+  home:[], results:[],
+  favorites: load('gi_favorites', []),
+  userPlaylists: load('gi_playlists', []),   // [{id,name,tracks:[]}]
+  cache:{},                                  // cache de playlists curadas
+  currentList:[],                            // lista renderizada agora (pra tocar/adicionar)
+  queue:[], index:-1,
+  sheetTrack:null, currentUserPl:null,
 };
 
-let sb = null;
-function initSupabase(){
-  if(!CFG.url || !CFG.key){
-    console.error('[Frota] Supabase não configurado. Preencha web/config.js (veja config.example.js).');
-    document.addEventListener('DOMContentLoaded', function(){
-      document.body.insertAdjacentHTML('afterbegin',
-        '<div style="background:#fde2e2;border:1px solid #f3b7b7;color:#8a1f1f;padding:14px;margin:12px;border-radius:10px;font:13px/1.5 -apple-system,Segoe UI,Roboto,Arial,sans-serif">'
-        + '<b>Configuração ausente.</b><br>Copie <code>config.example.js</code> para <code>config.js</code> e preencha a URL e a chave do seu projeto Supabase.'
-        + '</div>');
-    });
-    return;
-  }
-  sb = supabase.createClient(CFG.url, CFG.key);
+function load(k,def){ try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;} }
+function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+
+/* ---------- Audius ---------- */
+async function discoverHost(){
+  try{ const r=await fetch('https://api.audius.co'); const j=await r.json();
+    if(j.data&&j.data.length){ HOST=j.data[Math.floor(Math.random()*j.data.length)]; } }catch(e){}
 }
-initSupabase();
+const streamUrl = id => `${HOST}/v1/tracks/${id}/stream?app_name=${APP}`;
+function artwork(t){ const a=t.artwork||{}; return a['480x480']||a['150x150']||a['1000x1000']||''; }
+function fmt(s){ s=Math.max(0,Math.floor(s||0)); const m=Math.floor(s/60),x=s%60; return m+':'+String(x).padStart(2,'0'); }
+function isFav(id){ return state.favorites.some(t=>t.id===id); }
+function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+async function api(path){
+  const r=await fetch(`${HOST}${path}${path.includes('?')?'&':'?'}app_name=${APP}`);
+  if(!r.ok) throw new Error(r.status);
+  return (await r.json()).data||[];
+}
 
-/* =========================================================
-   DB — wrapper genérico (tabelas com coluna "dados" JSONB)
-========================================================= */
-const TABLES = ['veiculos','documentos','checklists','condutores','ordens','abastecimentos','pneus','multas','viagens','ocorrencias','planos_preventivos','fornecedores','pecas','orcamentos','cotacoes'];
-const STATE = {}; TABLES.forEach(t => STATE[t] = []);
+/* ---------- render base ---------- */
+const content=$('content');
+function skeleton(n=8){
+  let h='';
+  for(let i=0;i<n;i++) h+=`<div class="skeleton"><div class="sk" style="width:50px;height:50px"></div>
+    <div style="flex:1"><div class="sk" style="width:60%;height:13px;margin-bottom:8px"></div>
+    <div class="sk" style="width:35%;height:11px"></div></div></div>`;
+  content.innerHTML=`<div class="list">${h}</div>`;
+}
+function trackRow(t,i,opts={}){
+  const active = state.queue[state.index] && state.queue[state.index].id===t.id;
+  const fav=isFav(t.id);
+  return `<div class="row ${active?'active':''}" data-i="${i}">
+    ${opts.num?`<span class="num">${i+1}</span>`:''}
+    <img class="art" loading="lazy" src="${artwork(t)}" alt="" onerror="this.style.opacity=.2">
+    <div class="rinfo">
+      <div class="rtitle">${esc(t.title)}</div>
+      <div class="rartist">${esc(t.user?.name||'')}</div>
+    </div>
+    <span class="rdur">${fmt(t.duration)}</span>
+    <button class="iconbtn more" data-more="${i}" title="Opções">
+      <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+    </button>
+    <button class="iconbtn heart ${fav?'on':''}" data-fav="${i}" title="Favoritar">
+      <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.9-10-9.6C.4 8.2 1.9 4.5 5.2 4.1 7 3.9 8.7 4.8 12 8c3.3-3.2 5-4.1 6.8-3.9 3.3.4 4.8 4.1 3.2 7.3C19.5 16.1 12 21 12 21z"/></svg>
+    </button>
+  </div>`;
+}
+/* renderiza uma lista de faixas e a define como currentList */
+function renderTracks(tracks,title,opts={}){
+  state.currentList=tracks;
+  if(!tracks.length){ content.innerHTML=(opts.headHtml||'')+emptyView(opts.emptyKind); return; }
+  content.innerHTML=`${opts.headHtml||''}
+    ${title?`<div class="section-title"><span class="dot"></span>${title}${opts.mini?`<span class="mini">${opts.mini}</span>`:''}</div>`:''}
+    <div class="list">${tracks.map((t,i)=>trackRow(t,i,opts)).join('')}</div>`;
+}
+function emptyView(kind){
+  if(kind==='fav') return `<div class="empty">
+    <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.9-10-9.6C.4 8.2 1.9 4.5 5.2 4.1 7 3.9 8.7 4.8 12 8c3.3-3.2 5-4.1 6.8-3.9 3.3.4 4.8 4.1 3.2 7.3C19.5 16.1 12 21 12 21z"/></svg>
+    <p>Nenhum favorito ainda.<br>Toque no ♥ nas músicas pra salvar aqui.</p></div>`;
+  if(kind==='search') return `<div class="empty">
+    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.49 4.49 0 0 1 9.5 14z"/></svg>
+    <p>Busque por uma música ou artista lá em cima.</p></div>`;
+  if(kind==='userpl') return `<div class="empty"><p>Playlist vazia.<br>Use o <b>+</b> nas músicas pra adicionar aqui.</p></div>`;
+  return `<div class="empty"><p>Nada por aqui.</p></div>`;
+}
 
-const DB = {
-  async loadAll(){
-    for (const t of TABLES){
-      try{
-        const { data, error } = await sb.from(t).select('*').order('created_at', { ascending:false });
-        if (error) throw error;
-        STATE[t] = data || [];
-      }catch(e){ console.warn('load fail', t, e.message); }
+/* ---------- views principais ---------- */
+async function showHome(){
+  state.view='home'; state.currentUserPl=null;
+  if(state.home.length){ renderTracks(state.home,'Em alta agora'); return; }
+  skeleton();
+  try{ state.home=await api('/v1/tracks/trending?limit=40'); renderTracks(state.home,'Em alta agora'); }
+  catch(e){ content.innerHTML=`<div class="empty"><p>Erro ao carregar. Verifique a conexão.</p></div>`; }
+}
+
+let searchTimer=null,lastQuery='';
+async function doSearch(q){
+  q=q.trim(); state.view='search'; state.currentUserPl=null;
+  if(!q){ renderTracks([],'',{emptyKind:'search'}); return; }
+  skeleton(6); lastQuery=q;
+  try{
+    const data=await api(`/v1/tracks/search?query=${encodeURIComponent(q)}&limit=40`);
+    if(lastQuery!==q) return;
+    state.results=data; renderTracks(data,`Resultados para "${esc(q)}"`);
+  }catch(e){ content.innerHTML=`<div class="empty"><p>Erro na busca.</p></div>`; }
+}
+
+function showFav(){ state.view='fav'; state.currentUserPl=null; renderTracks(state.favorites,'Seus favoritos',{emptyKind:'fav'}); }
+
+/* ---------- Playlists (grid) ---------- */
+function showPlaylists(){
+  state.view='playlists'; state.currentUserPl=null;
+  const mine = state.userPlaylists.map(p=>`
+    <div class="plcard mine" data-userpl="${p.id}">
+      <span class="emoji">🎵</span><span class="cnt">${p.tracks.length}</span>
+      <div class="pltitle">${esc(p.name)}</div>
+      <div class="plsub">${p.tracks.length} faixa${p.tracks.length===1?'':'s'}</div>
+    </div>`).join('');
+  const curated = CURATED.map(p=>`
+    <div class="plcard" style="background:${p.grad}" data-curated="${p.id}">
+      <span class="emoji">${p.emoji}</span>
+      <div class="pltitle">${p.title}</div>
+      <div class="plsub">${p.sub}</div>
+    </div>`).join('');
+  content.innerHTML=`
+    <div class="section-title"><span class="dot"></span>Suas playlists</div>
+    <div class="grid">
+      <div class="plcard new" id="newPl"><div class="plus">+</div><div>Nova playlist</div></div>
+      ${mine}
+    </div>
+    <div class="section-title"><span class="dot"></span>Descobrir por estilo</div>
+    <div class="grid">${curated}</div>`;
+}
+
+/* abrir playlist curada */
+async function openCurated(id){
+  const p=CURATED.find(x=>x.id===id); if(!p) return; state.currentUserPl=null;
+  const head=headHtml(p.title, p.sub);
+  if(state.cache[id]){ renderTracks(state.cache[id], p.title, {headHtml:head, mini:`${state.cache[id].length} faixas`, playall:true, curatedId:id}); wireHead(); return; }
+  content.innerHTML=head+`<div class="skeleton" style="padding:40px;justify-content:center"><div class="sk" style="width:34px;height:34px;border-radius:50%"></div></div>`;
+  wireHead();
+  try{
+    const path = p.type==='genre'
+      ? `/v1/tracks/trending?genre=${encodeURIComponent(p.value)}&limit=40`
+      : `/v1/tracks/search?query=${encodeURIComponent(p.value)}&limit=40`;
+    const data=await api(path);
+    state.cache[id]=data;
+    renderTracks(data,p.title,{headHtml:head,mini:`${data.length} faixas`,playall:true,curatedId:id});
+    wireHead();
+  }catch(e){ content.innerHTML=head+`<div class="empty"><p>Erro ao carregar a playlist.</p></div>`; wireHead(); }
+}
+
+/* abrir playlist do usuário */
+function openUserPlaylist(id){
+  const p=state.userPlaylists.find(x=>x.id===id); if(!p) return;
+  state.currentUserPl=id;
+  const head=headHtml(p.name, `${p.tracks.length} faixa${p.tracks.length===1?'':'s'}`, {trash:true, userId:id, count:p.tracks.length});
+  renderTracks(p.tracks, p.name, {headHtml:head, num:true, playall:p.tracks.length>0, emptyKind:'userpl'});
+  wireHead(id);
+}
+
+function headHtml(title,sub,opts={}){
+  return `<div class="plhead">
+    <button class="backbtn" id="backBtn"><svg viewBox="0 0 24 24"><path d="M15.5 19l-7-7 7-7 1.4 1.4L11.3 12l5.6 5.6z"/></svg></button>
+    <div class="htitle"><h2>${esc(title)}</h2><p>${esc(sub||'')}</p></div>
+    ${opts.count>0||opts.count===undefined?`<button class="playall" id="playAll"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Tocar</button>`:''}
+    ${opts.trash?`<button class="trash" id="delPl"><svg viewBox="0 0 24 24"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2H8l1-2z"/></svg></button>`:''}
+  </div>`;
+}
+function wireHead(userId){
+  const back=$('backBtn'); if(back) back.onclick=showPlaylists;
+  const pa=$('playAll'); if(pa) pa.onclick=()=>{ if(state.currentList.length) playTracks(state.currentList,0); };
+  const del=$('delPl'); if(del) del.onclick=()=>{
+    if(confirm('Excluir esta playlist?')){
+      state.userPlaylists=state.userPlaylists.filter(p=>p.id!==userId);
+      save('gi_playlists',state.userPlaylists); showPlaylists(); toast('Playlist excluída');
     }
-  },
-  async put(table, id, dados){
-    const row = { dados, empresa_id: SESSION.empresaId, updated_at: new Date().toISOString() };
-    if (!navigator.onLine){ OFFQ.push(table, id, dados); UI.toast('Sem conexão — salvo localmente, sincroniza depois'); 
-      const idx = STATE[table].findIndex(r=>r.id===id);
-      const fake = { id: id || UTIL.uuid(), dados, empresa_id: SESSION.empresaId, created_at:new Date().toISOString(), updated_at:new Date().toISOString() };
-      if (idx>=0) STATE[table][idx] = fake; else STATE[table].unshift(fake);
-      return fake;
-    }
-    if (id){
-      const { data, error } = await sb.from(table).update(row).eq('id', id).select().single();
-      if (error){ console.error(error); UI.toast('Erro ao salvar: '+error.message); return null; }
-      const idx = STATE[table].findIndex(r=>r.id===id);
-      if (idx>=0) STATE[table][idx] = data; else STATE[table].unshift(data);
-      return data;
-    } else {
-      const { data, error } = await sb.from(table).insert(row).select().single();
-      if (error){ console.error(error); UI.toast('Erro ao salvar: '+error.message); return null; }
-      STATE[table].unshift(data);
-      return data;
-    }
-  },
-  async del(table, id){
-    const { error } = await sb.from(table).delete().eq('id', id);
-    if (error){ UI.toast('Erro ao excluir: '+error.message); return false; }
-    STATE[table] = STATE[table].filter(r=>r.id!==id);
-    return true;
-  },
-  get(table, id){ return STATE[table].find(r=>r.id===id); },
-  subscribeAll(){
-    TABLES.forEach(t=>{
-      sb.channel('rt_'+t).on('postgres_changes',{event:'*',schema:'public',table:t}, payload=>{
-        if (payload.eventType==='DELETE'){ STATE[t] = STATE[t].filter(r=>r.id!==payload.old.id); }
-        else { const idx = STATE[t].findIndex(r=>r.id===payload.new.id);
-          if (idx>=0) STATE[t][idx]=payload.new; else STATE[t].unshift(payload.new); }
-        if (ROUTER.current==='dashboard'||ROUTER.current==='parados'||ROUTER.current==='frota'||ROUTER.current==='preventiva') ROUTER.render();
-      }).subscribe();
-    });
+  };
+}
+
+/* ---------- player ---------- */
+function playTracks(list,i){
+  if(!list.length) return;
+  state.queue=list.slice(); state.index=i; loadCurrent(true);
+}
+function loadCurrent(autoplay){
+  const t=state.queue[state.index]; if(!t) return;
+  audio.src=streamUrl(t.id);              // streaming progressivo (Range): toca sem esperar baixar tudo
+  $('part').src=artwork(t);
+  $('ptitle').textContent=t.title;
+  $('partist').textContent=t.user?.name||'';
+  $('player').classList.add('show');
+  document.documentElement.style.setProperty('--player-h', getComputedStyle($('player')).height);
+  updatePlayerFav(); updateNavButtons(); refreshActiveRow();
+  if(autoplay) audio.play().catch(()=>{});
+  if('mediaSession' in navigator){
+    navigator.mediaSession.metadata=new MediaMetadata({
+      title:t.title, artist:t.user?.name||'', album:'GiMusic',
+      artwork:[{src:artwork(t),sizes:'480x480',type:'image/jpeg'}]});
   }
-};
+}
+function togglePlay(){
+  if(state.index<0){ if(state.currentList.length) playTracks(state.currentList,0); return; }
+  if(audio.paused) audio.play().catch(()=>{}); else audio.pause();
+}
+function next(){ if(state.index<state.queue.length-1){ state.index++; loadCurrent(true);} }
+function prev(){ if(audio.currentTime>3){ audio.currentTime=0; return; } if(state.index>0){ state.index--; loadCurrent(true);} else audio.currentTime=0; }
+function updateNavButtons(){ $('next').disabled=state.index>=state.queue.length-1; }
 
-/* Fila offline simples (para checklist em campo sem sinal) */
-const OFFQ = {
-  key: 'dpl_offline_queue',
-  push(table,id,dados){
-    const q = JSON.parse(localStorage.getItem(this.key)||'[]');
-    q.push({ table, id, dados, ts: Date.now() });
-    localStorage.setItem(this.key, JSON.stringify(q));
-  },
-  async flush(){
-    const q = JSON.parse(localStorage.getItem(this.key)||'[]');
-    if (!q.length) return;
-    UI.toast('Sincronizando '+q.length+' registro(s) pendente(s)...');
-    for (const item of q){ await DB.put(item.table, null, item.dados); }
-    localStorage.removeItem(this.key);
-    UI.toast('Sincronizado!');
+audio.addEventListener('play', ()=>{ $('playIcon').innerHTML='<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>'; if('mediaSession'in navigator)navigator.mediaSession.playbackState='playing'; });
+audio.addEventListener('pause',()=>{ $('playIcon').innerHTML='<path d="M8 5v14l11-7z"/>'; if('mediaSession'in navigator)navigator.mediaSession.playbackState='paused'; });
+audio.addEventListener('ended', next);
+audio.addEventListener('error', ()=>{ toast('Faixa indisponível — pulando'); setTimeout(next,600); });
+audio.addEventListener('loadedmetadata', ()=>{ $('dur').textContent=fmt(audio.duration); });
+audio.addEventListener('timeupdate', ()=>{ const d=audio.duration||0,c=audio.currentTime,p=d?c/d*100:0;
+  $('fill').style.width=p+'%'; $('knob').style.left=p+'%'; $('cur').textContent=fmt(c); });
+audio.addEventListener('progress', ()=>{ try{ if(audio.buffered.length){ const b=audio.buffered.end(audio.buffered.length-1),d=audio.duration||0;
+  $('buf').style.width=(d?b/d*100:0)+'%'; } }catch(e){} });
+
+const bar=$('bar');
+function seekAt(x){ const r=bar.getBoundingClientRect(),p=Math.min(1,Math.max(0,(x-r.left)/r.width)); if(audio.duration) audio.currentTime=p*audio.duration; }
+bar.addEventListener('click',e=>seekAt(e.clientX));
+let dragging=false;
+bar.addEventListener('pointerdown',e=>{dragging=true;seekAt(e.clientX);});
+window.addEventListener('pointermove',e=>{if(dragging)seekAt(e.clientX);});
+window.addEventListener('pointerup',()=>dragging=false);
+if('mediaSession' in navigator){
+  navigator.mediaSession.setActionHandler('play',()=>audio.play());
+  navigator.mediaSession.setActionHandler('pause',()=>audio.pause());
+  navigator.mediaSession.setActionHandler('previoustrack',prev);
+  navigator.mediaSession.setActionHandler('nexttrack',next);
+}
+
+/* ---------- favoritos ---------- */
+function toggleFav(track){
+  if(isFav(track.id)){ state.favorites=state.favorites.filter(x=>x.id!==track.id); toast('Removido dos favoritos'); }
+  else { state.favorites.unshift(track); toast('❤ Adicionado aos favoritos'); }
+  save('gi_favorites',state.favorites);
+  document.querySelectorAll('.row').forEach((r,i)=>{ const t=state.currentList[+r.dataset.i]; if(t){ r.querySelector('.heart')?.classList.toggle('on',isFav(t.id)); } });
+  updatePlayerFav();
+  if(state.view==='fav') showFav();
+}
+function updatePlayerFav(){ const t=state.queue[state.index]; $('pfav').classList.toggle('on', t?isFav(t.id):false); }
+function refreshActiveRow(){ document.querySelectorAll('.row').forEach(r=>{ const t=state.currentList[+r.dataset.i];
+  r.classList.toggle('active', !!(t && state.queue[state.index] && t.id===state.queue[state.index].id)); }); }
+
+/* ---------- playlists do usuário: adicionar ---------- */
+function canDownload(t){ const d=t.download||{}; return !!(t.is_downloadable||d.is_downloadable) && !d.requires_follow; }
+function downloadTrack(t){
+  const url=`${HOST}/v1/tracks/${t.id}/download?app_name=${APP}`;
+  const a=document.createElement('a'); a.href=url; a.download=''; a.rel='noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('⬇ Baixando no dispositivo...');
+}
+function openSheet(track){
+  state.sheetTrack=track;
+  const favd=isFav(track.id), inPl=state.currentUserPl;
+  let acts=`<div class="sheetitem" data-favtoggle="1"><div class="ico">${favd?'💔':'❤️'}</div>
+      <div class="txt"><b>${favd?'Remover dos favoritos':'Salvar nos favoritos'}</b></div></div>`;
+  if(canDownload(track)) acts+=`<div class="sheetitem" data-download="1"><div class="ico">⬇️</div>
+      <div class="txt"><b>Baixar no dispositivo</b><small>arquivo liberado pelo artista</small></div></div>`;
+  if(inPl) acts+=`<div class="sheetitem" data-removepl="1"><div class="ico">🗑️</div>
+      <div class="txt"><b>Remover desta playlist</b></div></div>`;
+  const items=state.userPlaylists.map(p=>`
+    <div class="sheetitem" data-addto="${p.id}"><div class="ico">🎵</div>
+      <div class="txt"><b>${esc(p.name)}</b><small>${p.tracks.length} faixa${p.tracks.length===1?'':'s'}</small></div></div>`).join('');
+  $('sheet').innerHTML=`
+    <div class="grip"></div>
+    <h3>${esc(track.title)}</h3>
+    <div class="subh">${esc(track.user?.name||'')}</div>
+    ${acts}
+    <div class="sheetdiv">Adicionar a playlist</div>
+    <div class="sheetitem newpl" data-newpl="1"><div class="ico">+</div>
+      <div class="txt"><b>Nova playlist</b><small>criar e adicionar</small></div></div>
+    ${items}`;
+  $('overlay').classList.add('show'); $('sheet').classList.add('show');
+}
+function closeSheet(){ $('overlay').classList.remove('show'); $('sheet').classList.remove('show'); state.sheetTrack=null; }
+function addToPlaylist(id,track){
+  const p=state.userPlaylists.find(x=>x.id===id); if(!p) return;
+  if(p.tracks.some(t=>t.id===track.id)){ toast('Já está nessa playlist'); return; }
+  p.tracks.push(track); save('gi_playlists',state.userPlaylists); toast(`Adicionada a "${p.name}"`);
+}
+function removeFromPlaylist(plId,trackId){
+  const p=state.userPlaylists.find(x=>x.id===plId); if(!p) return;
+  p.tracks=p.tracks.filter(t=>t.id!==trackId); save('gi_playlists',state.userPlaylists);
+  toast('Removida da playlist'); openUserPlaylist(plId);
+}
+function createPlaylist(name,firstTrack){
+  name=(name||'').trim(); if(!name) return null;
+  const p={id:Date.now(), name, tracks:firstTrack?[firstTrack]:[]};
+  state.userPlaylists.unshift(p); save('gi_playlists',state.userPlaylists); return p;
+}
+
+$('overlay').addEventListener('click',closeSheet);
+$('sheet').addEventListener('click',e=>{
+  const t=state.sheetTrack; if(!t) return;
+  if(e.target.closest('[data-favtoggle]')){ toggleFav(t); closeSheet(); return; }
+  if(e.target.closest('[data-download]')){ downloadTrack(t); closeSheet(); return; }
+  if(e.target.closest('[data-removepl]')){ const pl=state.currentUserPl; closeSheet(); removeFromPlaylist(pl,t.id); return; }
+  const addto=e.target.closest('[data-addto]');
+  if(addto){ addToPlaylist(+addto.dataset.addto, t); closeSheet(); if(state.view==='playlists') showPlaylists(); return; }
+  if(e.target.closest('[data-newpl]')){
+    const name=prompt('Nome da nova playlist:'); closeSheet();
+    const p=createPlaylist(name,t); if(p){ toast(`Playlist "${p.name}" criada`); if(state.view==='playlists') showPlaylists(); }
   }
-};
-window.addEventListener('online', ()=>{ document.getElementById('netDot').className='dot on'; OFFQ.flush(); });
-window.addEventListener('offline', ()=>{ document.getElementById('netDot').className='dot off'; });
+});
 
-/* =========================================================
-   SESSÃO / AUTH — multi-tenant via Supabase Auth
-   Cada usuário pertence a 1 empresa (perfis_usuario.empresa_id).
-   O RLS do banco já isola os dados por empresa; o app só
-   precisa saber qual é a empresa e o perfil do usuário logado.
-========================================================= */
-const ALCADA_LIMITE = 1500; // acima disso, aprovação de cotação exige Gestor/Gerência
-const PERFIS = [
-  { id:'gerencia', nome:'Gerência/Diretoria', pode:['ver_tudo','aprovar','custos','auditoria','aprovar_alcada_alta'] },
-  { id:'gestor_frota', nome:'Gestor de Frota', pode:['cadastros','programacao','bloqueios','oficinas','fornecedores','indicadores','validar_moderada','aprovar_alcada_alta'] },
-  { id:'encarregado', nome:'Encarregado de Oficina', pode:['triagem','os','pecas','liberacao_tecnica','aprovar_alcada_baixa'] },
-  { id:'mecanico', nome:'Mecânico', pode:['executar_tarefas','medicoes','pecas','fotos'] },
-  { id:'condutor', nome:'Condutor/Equipe', pode:['checklist','avarias','km','abastecimento'] },
-  { id:'compras', nome:'Compras/Financeiro', pode:['cotacoes','pedidos','contratos','pagamentos'] },
-  { id:'sesmt', nome:'SESMT/Fiscalização', pode:['seguranca','documentos','inspecoes','bloqueios'] },
-  { id:'fornecedor_externo', nome:'Fornecedor externo', pode:['portal_fornecedor'] },
-];
+/* ---------- toast ---------- */
+let toastTimer=null;
+function toast(m){ const el=$('toast'); el.textContent=m; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),1800); }
 
-const SESSION = { user:null, empresaId:null, empresaNome:null, perfilId:null, nome:null, fornecedorNome:null, pronto:false, plano:null, trialFim:null };
+/* ---------- cliques no conteúdo ---------- */
+content.addEventListener('click',e=>{
+  const fav=e.target.closest('[data-fav]');
+  if(fav){ e.stopPropagation(); toggleFav(state.currentList[+fav.dataset.fav]); return; }
+  const more=e.target.closest('[data-more]');
+  if(more){ e.stopPropagation(); openSheet(state.currentList[+more.dataset.more]); return; }
+  const cur=e.target.closest('[data-curated]'); if(cur){ openCurated(cur.dataset.curated); return; }
+  const up=e.target.closest('[data-userpl]'); if(up){ openUserPlaylist(+up.dataset.userpl); return; }
+  if(e.target.closest('#newPl')){ const name=prompt('Nome da nova playlist:'); const p=createPlaylist(name); if(p){ showPlaylists(); toast(`Playlist "${p.name}" criada`);} return; }
+  const row=e.target.closest('.row'); if(row){ playTracks(state.currentList, +row.dataset.i); }
+});
 
-const AUTH = {
-  perfil(){
-    if (!SESSION.perfilId) return null;
-    const base = PERFIS.find(x=>x.id===SESSION.perfilId) || { id:SESSION.perfilId, nome:SESSION.perfilId, pode:[] };
-    return { ...base, nome: SESSION.nome || base.nome, fornecedorNome: SESSION.fornecedorNome };
-  },
-  pode(acao){ const p=this.perfil(); return p && p.pode.includes(acao); },
-  isGestorOuGerencia(){ const p=this.perfil(); return p && (p.id==='gestor_frota'||p.id==='gerencia'); },
-  podeAprovarValor(valor){ const p=this.perfil(); if(!p) return false;
-    return valor <= ALCADA_LIMITE ? (p.pode.includes('aprovar_alcada_baixa')||p.pode.includes('aprovar_alcada_alta')) : p.pode.includes('aprovar_alcada_alta'); },
+/* ---------- tabs ---------- */
+$('tabs').addEventListener('click',e=>{
+  const tab=e.target.closest('.tab'); if(!tab) return;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active');
+  const v=tab.dataset.view;
+  if(v==='home') showHome();
+  else if(v==='playlists') showPlaylists();
+  else if(v==='search'){ doSearch($('q').value); $('q').focus(); }
+  else showFav();
+});
 
-  async login(email, senha){
-    const { data, error } = await sb.auth.signInWithPassword({ email, password:senha });
-    if (error) return { error: error.message };
-    const ok = await AUTH.carregarPerfil();
-    if (!ok) return { error:'Login feito, mas este usuário ainda não foi vinculado a uma empresa. Peça ao administrador para concluir o cadastro (perfis_usuario).' };
-    return { data };
-  },
-  async logout(){ await sb.auth.signOut(); location.reload(); },
-  async carregarPerfil(){
-    const { data:{ user } } = await sb.auth.getUser();
-    if (!user){ SESSION.user=null; SESSION.pronto=true; return false; }
-    SESSION.user = user;
-    const { data, error } = await sb.from('perfis_usuario').select('*, empresas(nome, frota_oficial, plano, trial_fim)').eq('user_id', user.id).single();
-    SESSION.pronto = true;
-    if (error || !data){ SESSION.perfilId=null; return false; }
-    SESSION.empresaId = data.empresa_id;
-    SESSION.perfilId = data.perfil;
-    SESSION.nome = data.nome;
-    SESSION.fornecedorNome = data.perfil==='fornecedor_externo' ? data.nome : null;
-    SESSION.empresaNome = data.empresas ? data.empresas.nome : null;
-    SESSION.plano = data.empresas ? data.empresas.plano : null;
-    SESSION.trialFim = data.empresas ? data.empresas.trial_fim : null;
-    if (data.empresas && data.empresas.frota_oficial) CFG.frotaOficial = data.empresas.frota_oficial;
-    return true;
-  },
-  statusAssinatura(){
-    if (SESSION.plano === 'standard') return { liberado:true, diasRestantes:null };
-    if (SESSION.plano === 'suspenso') return { liberado:false, motivo:'suspenso' };
-    // trial
-    const diasRestantes = SESSION.trialFim ? Math.ceil((new Date(SESSION.trialFim)-new Date())/86400000) : 0;
-    return { liberado: diasRestantes > 0, diasRestantes, motivo: diasRestantes>0?null:'trial_expirado' };
-  },
-  linkPagamento(){
-    return null; // mantido só por compatibilidade; pagamento agora é via PIX (ver AUTH.dadosPix)
-  },
-  dadosPix(){
-    const mensal = STATE.veiculos ? STATE.veiculos.length * 40 : 0;
-    return { ...PIX, valorSugerido: mensal, empresa: SESSION.empresaNome };
+/* ---------- busca ---------- */
+$('q').addEventListener('input',e=>{
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view==='search'));
+  clearTimeout(searchTimer); searchTimer=setTimeout(()=>doSearch(e.target.value),380);
+});
+
+/* ---------- controles / teclado ---------- */
+$('play').addEventListener('click',togglePlay);
+$('prev').addEventListener('click',prev);
+$('next').addEventListener('click',next);
+$('pfav').addEventListener('click',()=>{ const t=state.queue[state.index]; if(t) toggleFav(t); });
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.code==='Space'){ e.preventDefault(); togglePlay(); }
+  if(e.code==='ArrowRight') next();
+  if(e.code==='ArrowLeft') prev();
+});
+
+/* ---------- painel de letra ---------- */
+const lyr={open:false,lastIdx:-1,data:null,showTrans:true,cache:{}};
+
+function cleanTitle(s){
+  return (s||'')
+    .replace(/\s*[\(\[][^)\]]*[\)\]]/g,'')                       // remove (feat...), [remix]...
+    .replace(/\s*-\s*.*(remix|edit|cover|bootleg|vip|live|version|remaster|prod).*/i,'')
+    .trim();
+}
+async function lrclibGet(track){
+  const artist=track.user?.name||'', dur=Math.round(track.duration||0), base='https://lrclib.net/api';
+  try{
+    const u=`${base}/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(track.title)}&duration=${dur}`;
+    const r=await fetch(u); if(r.ok){ const j=await r.json(); if(j&&(j.syncedLyrics||j.plainLyrics)) return j; }
+  }catch(e){}
+  const ct=cleanTitle(track.title);
+  const tries=[
+    `${base}/search?track_name=${encodeURIComponent(ct)}&artist_name=${encodeURIComponent(artist)}`,
+    `${base}/search?q=${encodeURIComponent(ct+' '+artist)}`,
+    `${base}/search?track_name=${encodeURIComponent(ct)}`,
+  ];
+  for(const u of tries){
+    try{ const r=await fetch(u); if(r.ok){ const arr=await r.json(); const hit=(arr||[]).find(x=>x.syncedLyrics||x.plainLyrics); if(hit) return hit; } }catch(e){}
   }
-};
-
-/* =========================================================
-   UTIL
-========================================================= */
-const UTIL = {
-  uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c=='x'?r:(r&0x3|0x8);return v.toString(16);}); },
-  today(){ return new Date().toISOString().slice(0,10); },
-  fmtDate(d){ if(!d) return '—'; try{ return new Date(d).toLocaleDateString('pt-BR'); }catch(e){ return d; } },
-  fmtDateTime(d){ if(!d) return '—'; try{ return new Date(d).toLocaleString('pt-BR'); }catch(e){ return d; } },
-  daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); },
-  hash(str){ let h=0; for(let i=0;i<str.length;i++){ h=(h*31+str.charCodeAt(i))|0; } return h.toString(36); },
-  usuarioParaEmail(usuario){
-    const limpo = usuario.trim().toLowerCase().replace(/[^a-z0-9_.-]/g, '');
-    return limpo + '@login.frota.app';
-  },
-  async fileToDataURL(file){
-    return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-  },
-  async getGeo(){
-    return new Promise((res)=>{
-      if (!navigator.geolocation) return res(null);
-      navigator.geolocation.getCurrentPosition(
-        p=>res({lat:p.coords.latitude,lng:p.coords.longitude}),
-        ()=>res(null), { timeout:4000 }
-      );
-    });
-  },
-  addTimeline(veiculoId, tipo, descricao){
-    const v = DB.get('veiculos', veiculoId); if(!v) return;
-    const tl = v.dados.timeline || [];
-    tl.unshift({ data:new Date().toISOString(), tipo, descricao, usuario:(AUTH.perfil()||{}).nome||'—' });
-    v.dados.timeline = tl;
-    DB.put('veiculos', veiculoId, v.dados);
-  },
-  situacaoLabel(s){
-    return ({disponivel:'Disponível',em_rota:'Em rota',preventiva_programada:'Preventiva programada',
-      oficina_interna:'Oficina interna',oficina_externa:'Oficina externa',aguardando_peca:'Aguardando peça',
-      aguardando_orcamento:'Aguardando orçamento',bloqueado:'Bloqueado',sinistro:'Sinistro',
-      inativo:'Inativo',vendido:'Vendido'})[s] || s || '—';
-  },
-  etapaLabel(e){
-    return ({aguardando_diagnostico:'Aguardando diagnóstico',orcamento:'Orçamento',aprovacao:'Aprovação',
-      peca:'Aguardando peça',execucao:'Execução',teste:'Teste',liberacao:'Liberação'})[e] || e;
-  }
-};
-
-/* =========================================================
-   CHECKLIST — grupos e itens mínimos (roteiro seção 4)
-========================================================= */
-const CHECKLIST_GRUPOS = [
-  { grupo:'Identificação', itens:['Placa/Prefixo confere','Equipe correta','Condutor identificado','Odômetro/Horímetro registrado','Nível de combustível'] },
-  { grupo:'Segurança', itens:['Cintos de segurança','Extintor (quando aplicável)','Triângulo','Iluminação','Buzina','Freios','Retrovisores','Pneus (estado geral)'] },
-  { grupo:'Mecânica', itens:['Nível de óleo','Água/arrefecimento','Bateria','Vazamentos','Ruídos anormais','Painel/instrumentos','Suspensão','Direção'] },
-  { grupo:'Estrutura', itens:['Lataria','Vidros','Carroceria','Proteção lateral','Placa','Limpeza geral'] },
-  { grupo:'Especializados', itens:['Munck/Guindauto','Cesto aéreo','Lança','Patolas/Comandos','Parada de emergência','Isolação/certificados','Acessórios'] },
-  { grupo:'Documentos', itens:['CRLV','Certificados do implemento','Cronotacógrafo'] },
-];
-const RESP_ORDER = ['conforme','nc_leve','nc_moderada','critica','na'];
-const RESP_LABEL = { conforme:'Conforme', nc_leve:'NC leve', nc_moderada:'NC moderada', critica:'Crítica', na:'N/A' };
-const RESP_RANK = { conforme:0, na:0, nc_leve:1, nc_moderada:2, critica:3 };
-
-/* =========================================================
-   ROUTER / UI
-========================================================= */
-const ROUTER = { current:'dashboard',
-  render(){
-    const p = AUTH.perfil();
-    if (p && p.id==='fornecedor_externo' && this.current!=='config'){
-      document.getElementById('main').innerHTML = UI.renderPortalFornecedor();
-      UI.renderTabs(); return;
-    }
-    const fn = { dashboard:UI.renderDashboard, frota:UI.renderFrota, checklist:UI.renderChecklistHome,
-      preventiva:UI.renderPreventiva, parados:UI.renderParados, config:UI.renderConfig,
-      mais:UI.renderMais, fornecedores:UI.renderFornecedores, estoque:UI.renderEstoque,
-      pneus:UI.renderPneus, combustivel:UI.renderCombustivel, documentos:UI.renderDocumentos,
-      custos:UI.renderCustos, cotacoes:UI.renderCotacoes }[this.current];
-    document.getElementById('main').innerHTML = fn ? fn() : '';
-    UI.renderTabs();
-  }
-};
-
-const UI = {
-  toast(msg){
-    const el = document.createElement('div'); el.className='sync-toast'; el.textContent = msg;
-    document.body.appendChild(el); setTimeout(()=>el.remove(), 2600);
-  },
-  copiarPix(){
-    navigator.clipboard.writeText(PIX.chave).then(()=>UI.toast('Chave PIX copiada!'));
-  },
-  blocoPix(){
-    const d = AUTH.dadosPix();
-    return `
-      <div class="card" style="text-align:left;background:var(--gray)">
-        <div class="small">Pagamento via PIX — mensalidade estimada para <b>${STATE.veiculos?STATE.veiculos.length:0} veículo(s)</b>: <b>R$ ${d.valorSugerido.toFixed(2)}</b>/mês</div>
-        <table class="simple" style="margin-top:8px">
-          <tr><td>Chave PIX</td><td style="font-family:monospace">${d.chave}</td></tr>
-          <tr><td>Titular</td><td>${d.titular}</td></tr>
-          <tr><td>Instituição</td><td>${d.instituicao}</td></tr>
-          <tr><td>Banco / Agência / Conta</td><td>${d.banco} / ${d.agencia} / ${d.conta}</td></tr>
-        </table>
-        <button class="btn sec" style="width:100%;margin-top:10px" onclick="UI.copiarPix()">Copiar chave PIX</button>
-        <div class="small" style="margin-top:8px">Depois de pagar, envie o comprovante para quem administra o sistema — a liberação é confirmada manualmente em até 1 dia útil.</div>
-      </div>
-    `;
-  },
-  openModal(html){
-    document.getElementById('modalRoot').innerHTML =
-      `<div class="modal-bg" onclick="if(event.target===this)UI.closeModal()"><div class="modal">${html}</div></div>`;
-  },
-  closeModal(){ document.getElementById('modalRoot').innerHTML=''; },
-
-  MAIS_IDS: ['preventiva','fornecedores','estoque','pneus','combustivel','documentos','custos','mais'],
-  renderTabs(){
-    const tabs = [
-      ['dashboard','📊','Painel'],['frota','🚚','Frota'],['checklist','✅','Checklist'],
-      ['parados','🔧','Parados'],['mais','⋯','Mais'],['config','⚙️','Config']
-    ];
-    document.getElementById('tabs').innerHTML = tabs.map(([id,ic,label])=>{
-      const active = id==='mais' ? UI.MAIS_IDS.includes(ROUTER.current) : ROUTER.current===id;
-      return `<button class="${active?'active':''}" onclick="ROUTER.current='${id}';ROUTER.render()">
-        <span class="ic">${ic}</span>${label}</button>`;
-    }).join('');
-  },
-  renderMais(){
-    const cards = [
-      ['preventiva','🗓️','Agenda preventiva','Planos por km/tempo, status em dia/próximo/vencido'],
-      ['fornecedores','🏭','Fornecedores','Homologação, contratos, SLA e ranking'],
-      ['cotacoes','🧾','Cotações','Múltiplas propostas com aprovação por alçada'],
-      ['estoque','📦','Peças e estoque','Catálogo, saldo, mínimo/máximo, movimentações'],
-      ['pneus','🛞','Pneus','Vida por posição, sulco, custo/km'],
-      ['combustivel','⛽','Combustível','Abastecimento, km/L, desvios'],
-      ['documentos','📄','Documentos e multas','Vencimentos 90/60/30/15/7 dias'],
-      ['custos','💰','Custos e orçamento','Custo total, custo/km, TCO'],
-    ];
-    return `<div class="card">${cards.map(([id,ic,title,desc])=>
-      `<div class="list-item" style="cursor:pointer" onclick="ROUTER.current='${id}';ROUTER.render()">
-        <div><div style="font-weight:700">${ic} ${title}</div><div class="small">${desc}</div></div>
-        <span class="small">abrir ›</span></div>`).join('')}</div>`;
-  },
-
-  openPerfil(){
-    const p = AUTH.perfil();
-    UI.openModal(`<button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>Conta</h3>
-      <table class="simple">
-        <tr><td>Empresa</td><td>${SESSION.empresaNome||'—'}</td></tr>
-        <tr><td>Usuário</td><td>${SESSION.user?SESSION.user.email:'—'}</td></tr>
-        <tr><td>Perfil</td><td>${p?p.nome:'—'}</td></tr>
-      </table>
-      <div class="small" style="margin-top:8px">Para trocar de perfil, peça ao administrador da sua empresa para ajustar seu vínculo, ou saia e entre com outra conta.</div>
-      <button class="btn danger" style="margin-top:12px" onclick="AUTH.logout()">Sair</button>`);
-  },
-  updateHeader(){
-    const p = AUTH.perfil();
-    document.getElementById('perfilBadge').innerHTML = `<span class="dot ${navigator.onLine?'on':'off'}" id="netDot"></span>${SESSION.empresaNome?SESSION.empresaNome+' · ':''}${p? p.nome : '—'}`;
-  },
-
-  renderLogin(){
-    return `
-      <div style="max-width:380px;margin:60px auto 0;text-align:center">
-        <div style="font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px">Frota</div>
-        <div class="small" style="margin-bottom:18px">Entre com o usuário da sua empresa</div>
-        <div class="card" style="text-align:left">
-          <label>Usuário</label><input id="lg_email" placeholder="Frota_NomeDaEmpresa">
-          <label>Senha</label><input id="lg_senha" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')UI.doLogin()">
-          <button class="btn" style="width:100%;margin-top:12px" onclick="UI.doLogin()">Entrar</button>
-          <div class="small" id="lg_erro" style="color:var(--bad);margin-top:8px"></div>
-        </div>
-        <div class="small" style="margin-top:14px">Esqueceu o usuário ou a senha da sua empresa? Fale com quem administra o sistema por lá.</div>
-        <button class="btn ghost" style="margin-top:10px" onclick="ROUTER._tela='signup';UI.renderAuthScreen()">Sua empresa ainda não usa o Frota? Criar conta agora</button>
-      </div>
-    `;
-  },
-  renderSignup(){
-    return `
-      <div style="max-width:420px;margin:40px auto 0;text-align:center">
-        <div style="font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px">Criar conta da empresa</div>
-        <div class="small" style="margin-bottom:18px">Leva 1 minuto — sem precisar falar com ninguém.</div>
-        <div class="card" style="text-align:left">
-          <label>Nome da empresa</label><input id="su_empresa" placeholder="Ex.: Transportes Silva LTDA">
-          <label>Seu nome</label><input id="su_nome" placeholder="Seu nome completo">
-          <label>Tamanho aproximado da frota</label><input id="su_frota" type="number" placeholder="Ex.: 25">
-          <label>Escolha um usuário para a empresa</label><input id="su_email" placeholder="Frota_SuaEmpresa">
-          <label>Crie uma senha</label><input id="su_senha" type="password" placeholder="mínimo 6 caracteres">
-          <button class="btn" style="width:100%;margin-top:12px" onclick="UI.doSignup()">Criar conta</button>
-          <div class="small" id="su_erro" style="color:var(--bad);margin-top:8px"></div>
-        </div>
-        <div class="small" style="margin-top:10px">Esse usuário e senha são únicos por empresa — todas as pessoas da equipe entram com o mesmo acesso.</div>
-        <button class="btn ghost" style="margin-top:12px" onclick="ROUTER._tela='login';UI.renderAuthScreen()">Já tenho conta — voltar para o login</button>
-      </div>
-    `;
-  },
-  renderAuthScreen(){
-    document.getElementById('main').innerHTML = ROUTER._tela==='signup' ? UI.renderSignup() : UI.renderLogin();
-    document.getElementById('tabs').innerHTML = '';
-  },
-  async doLogin(){
-    const usuario = document.getElementById('lg_email').value.trim();
-    const senha = document.getElementById('lg_senha').value;
-    const erroEl = document.getElementById('lg_erro');
-    if (!usuario){ erroEl.textContent = 'Informe o usuário da empresa.'; return; }
-    erroEl.textContent = 'Entrando...';
-    const res = await AUTH.login(UTIL.usuarioParaEmail(usuario), senha);
-    if (res.error){ erroEl.textContent = 'Usuário ou senha incorretos.'; return; }
-    await BOOT.iniciarAposLogin();
-  },
-  async doSignup(){
-    const empresa = document.getElementById('su_empresa').value.trim();
-    const nome = document.getElementById('su_nome').value.trim();
-    const frota = parseInt(document.getElementById('su_frota').value)||0;
-    const usuario = document.getElementById('su_email').value.trim();
-    const senha = document.getElementById('su_senha').value;
-    const erroEl = document.getElementById('su_erro');
-    if (!empresa || !nome || !usuario || senha.length < 6){ erroEl.textContent='Preencha nome da empresa, seu nome, usuário e uma senha de pelo menos 6 caracteres.'; return; }
-    erroEl.textContent = 'Criando conta...';
-    const { data, error } = await sb.auth.signUp({ email: UTIL.usuarioParaEmail(usuario), password:senha });
-    if (error){ erroEl.textContent = error.message.includes('registered') ? 'Esse usuário já existe — escolha outro nome.' : error.message; return; }
-    UI._pendingSignup = { empresa, nome, frota };
-    if (data.session){
-      await UI.finalizarCriacaoEmpresa();
-    } else {
-      erroEl.style.color = 'var(--ok)';
-      erroEl.textContent = 'Conta criada! Volte e faça login com o usuário e senha que você escolheu.';
-    }
-  },
-  async finalizarCriacaoEmpresa(){
-    const pend = UI._pendingSignup;
-    const { error } = await sb.rpc('onboarding_criar_empresa', {
-      p_nome_empresa: pend ? pend.empresa : (document.getElementById('cc_empresa')||{}).value,
-      p_nome_usuario: pend ? pend.nome : (document.getElementById('cc_nome')||{}).value,
-      p_frota_oficial: pend ? pend.frota : parseInt((document.getElementById('cc_frota')||{}).value)||0
-    });
-    if (error){ UI.toast('Erro ao criar empresa: '+error.message); return; }
-    UI.toast('Empresa criada! Bem-vindo(a) ao Frota.');
-    await BOOT.iniciarAposLogin();
-  },
-  renderCompletarCadastro(){
-    return `<div class="card" style="max-width:420px;margin:40px auto 0">
-      <h3>Falta um passo: cadastre sua empresa</h3>
-      <div class="small">Seu login funcionou, mas ainda não existe uma empresa vinculada a ele. Preencha para concluir.</div>
-      <label>Nome da empresa</label><input id="cc_empresa" placeholder="Ex.: Transportes Silva LTDA">
-      <label>Seu nome</label><input id="cc_nome" placeholder="Seu nome completo">
-      <label>Tamanho aproximado da frota</label><input id="cc_frota" type="number" placeholder="Ex.: 25">
-      <button class="btn" style="width:100%;margin-top:12px" onclick="UI.finalizarCriacaoEmpresa()">Concluir cadastro</button>
-      <button class="btn ghost" style="width:100%;margin-top:8px" onclick="AUTH.logout()">Sair e tentar outra conta</button>
-    </div>`;
-  },
-  renderPaywall(motivo){
-    const titulo = motivo==='suspenso' ? 'Assinatura suspensa' : 'Seu período de teste acabou';
-    const texto = motivo==='suspenso'
-      ? 'O acesso da sua empresa está suspenso. Fale com o administrador ou regularize o pagamento para reativar.'
-      : 'Os 7 dias de teste grátis do Frota chegaram ao fim. Faça o pagamento para continuar usando — seus dados continuam salvos e disponíveis assim que a assinatura for confirmada.';
-    return `<div style="max-width:420px;margin:60px auto 0;text-align:center">
-      <div class="card">
-        <h3>${titulo}</h3>
-        <div class="small" style="margin:8px 0 0">${texto}</div>
-        <div class="small" style="margin-top:10px">Empresa: ${SESSION.empresaNome} · ${SESSION.user?SESSION.user.email.split('@')[0]:''}</div>
-      </div>
-      ${UI.blocoPix()}
-      <button class="btn ghost" style="width:100%;margin-top:12px" onclick="AUTH.logout()">Sair</button>
-    </div>`;
-  },
-
-  /* -------------------- CONFIG (admin da empresa) -------------------- */
-  renderAdminEquipe(){
-    return `
-      <div class="card">
-        <h2 class="sec" style="margin-top:0">Convidar pessoa da equipe</h2>
-        <div class="small">Novos usuários são criados pelo administrador no painel do Supabase (Authentication → Users) e depois vinculados à empresa rodando o script <code>sql/onboarding_novo_cliente.sql</code> (passos 3 e 4). Isso evita que qualquer pessoa se autocadastre numa empresa que não é a dela.</div>
-      </div>
-    `;
-  },
-
-  /* -------------------- DASHBOARD -------------------- */
-  renderDashboard(){
-    const veiculos = STATE.veiculos;
-    const cadastrados = veiculos.length;
-    const oficial = CFG.frotaOficial;
-    const disponiveis = veiculos.filter(v=>['disponivel','em_rota'].includes(v.dados.situacao)).length;
-    const parados = veiculos.filter(v=>['oficina_interna','oficina_externa','aguardando_peca','aguardando_orcamento','bloqueado'].includes(v.dados.situacao)).length;
-    const ofInterna = veiculos.filter(v=>v.dados.situacao==='oficina_interna').length;
-    const ofExterna = veiculos.filter(v=>v.dados.situacao==='oficina_externa').length;
-    const osAbertas = STATE.ordens.filter(o=>!o.dados.saida || !o.dados.saida.data);
-    const corretivas = osAbertas.filter(o=>o.dados.tipo==='corretiva').length;
-    const preventivasOS = osAbertas.filter(o=>o.dados.tipo==='preventiva').length;
-    const hoje = UTIL.today();
-    const saidasHoje = osAbertas.filter(o=>o.dados.previsao_saida && o.dados.previsao_saida.data===hoje).length;
-    const em7 = osAbertas.filter(o=>{ const d=o.dados.previsao_saida&&o.dados.previsao_saida.data; if(!d) return false;
-      const diff = UTIL.daysBetween(hoje,d); return diff>=0 && diff<=7; }).length;
-    const semPrevisao = osAbertas.filter(o=>!o.dados.previsao_saida || !o.dados.previsao_saida.data).length;
-    const atrasadas = osAbertas.filter(o=>o.dados.previsao_saida && o.dados.previsao_saida.data && o.dados.previsao_saida.data < hoje);
-    const atrasoMedio = atrasadas.length ? Math.round(atrasadas.reduce((s,o)=>s+UTIL.daysBetween(o.dados.previsao_saida.data,hoje),0)/atrasadas.length) : 0;
-    const disponibilidadePct = oficial ? Math.round((disponiveis/oficial)*100) : 0;
-
-    let banner = '';
-    const status = AUTH.statusAssinatura();
-    if (status.liberado && SESSION.plano==='trial' && status.diasRestantes<=3){
-      banner += `<div class="banner">🕐 Faltam <b>${status.diasRestantes} dia(s)</b> do seu teste grátis. Veja os dados de pagamento em <b>Config → Assinatura</b> para não perder o acesso.</div>`;
-    }
-    if (cadastrados !== oficial){
-      banner += `<div class="banner">⚠️ Frota oficial = <b>${oficial}</b> veículos/equipamentos, mas há <b>${cadastrados}</b> cadastrados.
-        Conciliar cadastro antes de fechar indicadores (governança do roteiro).</div>`;
-    }
-    const pendValidacao = STATE.checklists.filter(c=>c.dados.resultado==='pendente_validacao').length;
-    if (pendValidacao && AUTH.isGestorOuGerencia()){
-      banner += `<div class="banner">🟡 ${pendValidacao} checklist(s) com não conformidade moderada aguardando sua validação.</div>`;
-    }
-    const docsVencidos = STATE.documentos.filter(d=>d.dados.validade && d.dados.validade < hoje).length;
-    if (docsVencidos) banner += `<div class="banner bad">📄 ${docsVencidos} documento(s) vencido(s) — acesse "Mais → Documentos".</div>`;
-    const estoqueBaixo = STATE.pecas.filter(p=>(p.dados.saldo||0) <= (p.dados.minimo||0)).length;
-    if (estoqueBaixo) banner += `<div class="banner">📦 ${estoqueBaixo} peça(s) em ruptura de estoque.</div>`;
-
-    return `
-      ${banner}
-      <h2 class="sec">Disponibilidade</h2>
-      <div class="grid kpi-grid">
-        <div class="kpi ${disponibilidadePct>=85?'ok':disponibilidadePct>=60?'warn':'bad'}"><div class="n">${disponibilidadePct}%</div><div class="l">Disponibilidade (base ${oficial})</div></div>
-        <div class="kpi ok"><div class="n">${disponiveis}</div><div class="l">Disponíveis</div></div>
-        <div class="kpi bad"><div class="n">${parados}</div><div class="l">Parados totais</div></div>
-        <div class="kpi"><div class="n">${cadastrados}/${oficial}</div><div class="l">Cadastrados / oficial</div></div>
-      </div>
-      <h2 class="sec">Oficina</h2>
-      <div class="grid kpi-grid">
-        <div class="kpi bad"><div class="n">${corretivas}</div><div class="l">Corretivas abertas</div></div>
-        <div class="kpi warn"><div class="n">${preventivasOS}</div><div class="l">Preventivas em execução</div></div>
-        <div class="kpi"><div class="n">${ofInterna}</div><div class="l">Oficina interna</div></div>
-        <div class="kpi"><div class="n">${ofExterna}</div><div class="l">Oficina externa</div></div>
-        <div class="kpi ok"><div class="n">${saidasHoje}</div><div class="l">Saídas previstas hoje</div></div>
-        <div class="kpi"><div class="n">${em7}</div><div class="l">Saídas previstas (7 dias)</div></div>
-        <div class="kpi warn"><div class="n">${semPrevisao}</div><div class="l">Sem previsão de saída</div></div>
-        <div class="kpi bad"><div class="n">${atrasoMedio}d</div><div class="l">Atraso médio</div></div>
-      </div>
-      <h2 class="sec">Atalhos</h2>
-      <div class="row">
-        <button class="btn" onclick="ROUTER.current='checklist';ROUTER.render()">Novo checklist</button>
-        <button class="btn sec" onclick="ROUTER.current='parados';ROUTER.render()">Ver veículos parados</button>
-      </div>
-      ${(()=>{
-        const riscos = veiculos.map(v=>({v, score:UI.calcRisco(v.id)})).filter(r=>r.score>0).sort((a,b)=>b.score-a.score).slice(0,5);
-        if (!riscos.length) return '';
-        return `<h2 class="sec">Maior risco de falha (heurístico)</h2>
-        <div class="card">${riscos.map(r=>`<div class="list-item"><span>${r.v.dados.prefixo}</span>
-        <span class="pill ${r.score>=60?'bloqueado':'aguardando_peca'}">${r.score} pts</span></div>`).join('')}
-        <div class="small" style="margin-top:6px">Baseado em retrabalho, checklists críticos recentes e preventivas vencidas — não usa telemetria real (ver observação em Config).</div></div>`;
-      })()}
-    `;
-  },
-
-  /* -------------------- FROTA / FICHA 360 -------------------- */
-  renderFrota(){
-    const list = STATE.veiculos;
-    return `
-      <div class="row" style="margin-bottom:10px">
-        <button class="btn" onclick="UI.openVeiculoForm()">+ Novo veículo/equipamento</button>
-      </div>
-      <div class="card">
-        ${list.length===0? '<div class="small">Nenhum veículo cadastrado ainda.</div>' :
-          list.map(v=>`
-          <div class="list-item" style="cursor:pointer" onclick="UI.openFicha('${v.id}')">
-            <div>
-              <div style="font-weight:700">${v.dados.prefixo||'—'} · ${v.dados.placa||'—'}</div>
-              <div class="small">${v.dados.marca||''} ${v.dados.modelo||''} · ${v.dados.classificacao||''}</div>
-            </div>
-            <span class="pill ${v.dados.situacao}">${UTIL.situacaoLabel(v.dados.situacao)}</span>
-          </div>`).join('')}
-      </div>
-    `;
-  },
-
-  openVeiculoForm(id){
-    const v = id ? DB.get('veiculos', id) : { dados:{} };
-    const d = v.dados;
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>${id?'Editar':'Novo'} veículo/equipamento</h3>
-      <div class="accordion">
-        <h4>Identificação</h4>
-        <div class="body">
-          <div class="row"><div><label>Placa</label><input id="f_placa" value="${d.placa||''}"></div>
-          <div><label>Prefixo</label><input id="f_prefixo" value="${d.prefixo||''}"></div></div>
-          <div class="row"><div><label>RENAVAM</label><input id="f_renavam" value="${d.renavam||''}"></div>
-          <div><label>Chassi</label><input id="f_chassi" value="${d.chassi||''}"></div></div>
-          <div class="row"><div><label>Patrimônio</label><input id="f_patrimonio" value="${d.patrimonio||''}"></div>
-          <div><label>Ano</label><input id="f_ano" value="${d.ano||''}"></div></div>
-          <div class="row"><div><label>Marca</label><input id="f_marca" value="${d.marca||''}"></div>
-          <div><label>Modelo</label><input id="f_modelo" value="${d.modelo||''}"></div></div>
-          <div class="row"><div><label>Cor</label><input id="f_cor" value="${d.cor||''}"></div>
-          <div><label>Combustível</label><input id="f_combustivel" value="${d.combustivel||''}"></div></div>
-        </div>
-        <h4>Classificação e lotação</h4>
-        <div class="body">
-          <label>Classificação</label>
-          <select id="f_classificacao">
-            ${['Munck','Cesto Simples','Cesto Duplo','F4000','Carroceria Aberta','Hilux','Strada','Equipamento de apoio']
-              .map(c=>`<option ${d.classificacao===c?'selected':''}>${c}</option>`).join('')}
-          </select>
-          <div class="row"><div><label>Regional</label><input id="f_regional" value="${d.regional||'Metropolitana - PI'}"></div>
-          <div><label>Base</label><input id="f_base" value="${d.base||''}"></div></div>
-          <div class="row"><div><label>Município</label><input id="f_municipio" value="${d.municipio||''}"></div>
-          <div><label>Centro de custo</label><input id="f_centro_custo" value="${d.centro_custo||''}"></div></div>
-          <div class="row"><div><label>Equipe atual</label><input id="f_equipe" value="${d.equipe_atual||''}"></div>
-          <div><label>Responsável</label><input id="f_responsavel" value="${d.responsavel||''}"></div></div>
-        </div>
-        <h4>Dados técnicos</h4>
-        <div class="body">
-          <div class="row"><div><label>Odômetro (km)</label><input id="f_odometro" type="number" value="${d.odometro||0}"></div>
-          <div><label>Horímetro (h)</label><input id="f_horimetro" type="number" value="${d.horimetro||0}"></div></div>
-          <div class="row"><div><label>Capacidade / PBT</label><input id="f_pbt" value="${d.pbt||''}"></div>
-          <div><label>Implementos</label><input id="f_implementos" value="${d.implementos||''}"></div></div>
-          <div class="row"><div><label>Valor de aquisição (R$)</label><input id="f_valor_aquisicao" type="number" value="${d.valor_aquisicao||''}"></div>
-          <div><label>Data de aquisição</label><input id="f_data_aquisicao" type="date" value="${d.data_aquisicao||''}"></div></div>
-        </div>
-        <h4>Situação</h4>
-        <div class="body">
-          <select id="f_situacao">
-            ${['disponivel','em_rota','preventiva_programada','oficina_interna','oficina_externa','aguardando_peca','aguardando_orcamento','bloqueado','sinistro','inativo','vendido']
-              .map(s=>`<option value="${s}" ${d.situacao===s?'selected':''}>${UTIL.situacaoLabel(s)}</option>`).join('')}
-          </select>
-        </div>
-      </div>
-      <div class="row" style="margin-top:14px">
-        <button class="btn" onclick="UI.saveVeiculo('${id||''}')">Salvar</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  async saveVeiculo(id){
-    const g = (x)=>document.getElementById(x).value;
-    const existing = id ? DB.get('veiculos', id).dados : {};
-    // Regra essencial: sem duplicidade por placa/chassi/prefixo
-    const placa = g('f_placa').toUpperCase().trim();
-    const dup = STATE.veiculos.find(v=>v.id!==id && v.dados.placa===placa && placa!=='');
-    if (dup){ UI.toast('❌ Já existe veículo com essa placa'); return; }
-    const dados = { ...existing,
-      placa, prefixo:g('f_prefixo'), renavam:g('f_renavam'), chassi:g('f_chassi'), patrimonio:g('f_patrimonio'),
-      ano:g('f_ano'), marca:g('f_marca'), modelo:g('f_modelo'), cor:g('f_cor'), combustivel:g('f_combustivel'),
-      classificacao:g('f_classificacao'), regional:g('f_regional'), base:g('f_base'), municipio:g('f_municipio'),
-      centro_custo:g('f_centro_custo'), equipe_atual:g('f_equipe'), responsavel:g('f_responsavel'),
-      odometro:parseFloat(g('f_odometro'))||0, horimetro:parseFloat(g('f_horimetro'))||0,
-      pbt:g('f_pbt'), implementos:g('f_implementos'), situacao:g('f_situacao'),
-      valor_aquisicao: parseFloat(g('f_valor_aquisicao'))||existing.valor_aquisicao||null,
-      data_aquisicao: g('f_data_aquisicao')||existing.data_aquisicao||null,
-      timeline: existing.timeline || [], documentos: existing.documentos || [], equipamentos_embarcados: existing.equipamentos_embarcados || []
-    };
-    const saved = await DB.put('veiculos', id||null, dados);
-    if (saved){ UTIL.addTimeline(saved.id, 'cadastro', id?'Ficha atualizada':'Veículo cadastrado'); UI.closeModal(); ROUTER.render(); }
-  },
-
-  openFicha(id){
-    const v = DB.get('veiculos', id); if(!v) return;
-    const d = v.dados;
-    const osDoVeiculo = STATE.ordens.filter(o=>o.dados.veiculo_id===id);
-    const tl = d.timeline || [];
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>${d.prefixo} · ${d.placa}</h3>
-      <div class="small">${d.marca||''} ${d.modelo||''} — ${d.classificacao||''}</div>
-      <span class="pill ${d.situacao}" style="margin-top:8px;display:inline-block">${UTIL.situacaoLabel(d.situacao)}</span>
-      <h4 style="margin-top:14px">Dados técnicos</h4>
-      <table class="simple">
-        <tr><td>Base / Regional</td><td>${d.base||'—'} / ${d.regional||'—'}</td></tr>
-        <tr><td>Centro de custo</td><td>${d.centro_custo||'—'}</td></tr>
-        <tr><td>Equipe atual</td><td>${d.equipe_atual||'—'}</td></tr>
-        <tr><td>Odômetro / Horímetro</td><td>${d.odometro||0} km / ${d.horimetro||0} h</td></tr>
-      </table>
-      <h4>Ordens de serviço (${osDoVeiculo.length})</h4>
-      ${osDoVeiculo.slice(0,5).map(o=>`<div class="list-item" style="cursor:pointer" onclick="UI.openOS('${o.id}')">
-        <span>OS ${o.dados.numero||o.id.slice(0,8)} · ${UTIL.etapaLabel(o.dados.etapa)}</span>
-        <span class="small">${UTIL.fmtDate(o.dados.data_entrada)}</span></div>`).join('') || '<div class="small">Nenhuma.</div>'}
-      <h4>Linha do tempo</h4>
-      <div>${tl.slice(0,15).map(t=>`<div class="timeline-item"><b>${t.tipo}</b> — ${t.descricao}<br><span class="small">${UTIL.fmtDateTime(t.data)} · ${t.usuario}</span></div>`).join('') || '<div class="small">Sem eventos.</div>'}</div>
-      <div class="row" style="margin-top:10px">
-        <button class="btn sec" onclick="UI.openVeiculoForm('${id}')">Editar ficha</button>
-      </div>
-    `);
-  },
-
-  /* -------------------- CHECKLIST -------------------- */
-  renderChecklistHome(){
-    const veiculos = STATE.veiculos;
-    return `
-      <div class="card">
-        <label>Veículo/Equipamento</label>
-        <select id="chk_veiculo">${veiculos.map(v=>`<option value="${v.id}">${v.dados.prefixo} · ${v.dados.placa}</option>`).join('')}</select>
-        <button class="btn" style="margin-top:10px" onclick="UI.startChecklist()">Iniciar checklist</button>
-      </div>
-      <h2 class="sec">Últimos checklists</h2>
-      <div class="card">
-        ${STATE.checklists.slice(0,10).map(c=>{
-          const v = DB.get('veiculos', c.dados.veiculo_id);
-          return `<div class="list-item"><span>${v?v.dados.prefixo:'?'} — ${c.dados.resultado}</span><span class="small">${UTIL.fmtDateTime(c.created_at)}</span></div>`;
-        }).join('') || '<div class="small">Nenhum checklist registrado.</div>'}
-      </div>
-    `;
-  },
-  startChecklist(){
-    const veiculoId = document.getElementById('chk_veiculo').value;
-    if (!veiculoId){ UI.toast('Cadastre um veículo primeiro'); return; }
-    UI._chk = { veiculoId, startTs: Date.now(), respostas:{}, fotos:{} };
-    UI.openChecklistForm();
-  },
-  openChecklistForm(){
-    const grupos = CHECKLIST_GRUPOS.map(g=>`
-      <div class="chk-grupo"><h4>${g.grupo}</h4>
-        ${g.itens.map((item,idx)=>{
-          const key = g.grupo+'|'+item;
-          const cur = UI._chk.respostas[key] || '';
-          return `<div class="chk-item">
-            <div class="nome">${item}</div>
-            <div class="opts">
-              ${RESP_ORDER.map(r=>`<button class="opt ${cur===r?'sel-'+r:''}" onclick="UI.setResp('${key.replace(/'/g,"\\'")}','${r}')">${RESP_LABEL[r]}</button>`).join('')}
-            </div>
-            ${(cur==='nc_leve'||cur==='nc_moderada'||cur==='critica')?`<input type="file" accept="image/*" capture="environment" style="margin-top:6px" onchange="UI.attachFoto('${key.replace(/'/g,"\\'")}', this)">`:''}
-          </div>`;
-        }).join('')}
-      </div>`).join('');
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>Checklist diário — móvel</h3>
-      <div class="small">Fotos obrigatórias em qualquer não conformidade. Item crítico bloqueia o veículo automaticamente.</div>
-      <div id="chkGrupos" style="margin-top:10px">${grupos}</div>
-      <h4>Evidências obrigatórias</h4>
-      <div class="row">
-        <div><label>Foto frontal</label><input type="file" accept="image/*" capture="environment" onchange="UI.attachFoto('_frontal', this)"></div>
-        <div><label>Foto traseira</label><input type="file" accept="image/*" capture="environment" onchange="UI.attachFoto('_traseira', this)"></div>
-      </div>
-      <div class="row">
-        <div><label>Painel/odômetro</label><input type="file" accept="image/*" capture="environment" onchange="UI.attachFoto('_painel', this)"></div>
-        <div><label>Odômetro atual</label><input type="number" id="chk_odometro"></div>
-      </div>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.submitChecklist()">Finalizar checklist</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  setResp(key, val){ UI._chk.respostas[key]=val; UI.openChecklistForm(); },
-  async attachFoto(key, input){
-    const file = input.files[0]; if(!file) return;
-    const dataUrl = await UTIL.fileToDataURL(file);
-    UI._chk.fotos[key] = dataUrl;
-    UI.toast('Foto anexada');
-  },
-  async submitChecklist(){
-    const chk = UI._chk;
-    const itensAnswered = Object.keys(chk.respostas).length;
-    const totalItens = CHECKLIST_GRUPOS.reduce((s,g)=>s+g.itens.length,0);
-    if (itensAnswered < totalItens){ UI.toast('Responda todos os itens antes de finalizar'); return; }
-    // antifraude: velocidade
-    const elapsedSec = (Date.now()-chk.startTs)/1000;
-    const alertas = [];
-    if (elapsedSec < 30) alertas.push('checklist_muito_rapido');
-    // antifraude: reuso de foto (hash simples)
-    const usedHashes = JSON.parse(localStorage.getItem('dpl_photo_hashes')||'[]');
-    let novoHashes = [...usedHashes];
-    Object.values(chk.fotos).forEach(dataUrl=>{
-      const h = UTIL.hash(dataUrl.slice(0,500)+dataUrl.length);
-      if (usedHashes.includes(h)) alertas.push('possivel_reuso_foto');
-      novoHashes.push(h);
-    });
-    localStorage.setItem('dpl_photo_hashes', JSON.stringify(novoHashes.slice(-500)));
-    const geo = await UTIL.getGeo();
-    if (!geo) alertas.push('sem_geolocalizacao');
-
-    // pior classificação
-    let worst = 'conforme';
-    const itens = Object.entries(chk.respostas).map(([key,resp])=>{
-      if (RESP_RANK[resp] > RESP_RANK[worst]) worst = resp;
-      const [grupo,item] = key.split('|');
-      return { grupo, item, resposta:resp, foto: chk.fotos[key]||null };
-    });
-
-    const dados = {
-      veiculo_id: chk.veiculoId, condutor:(AUTH.perfil()||{}).nome||'—',
-      data_hora: new Date().toISOString(), geolocalizacao: geo,
-      odometro: parseFloat(document.getElementById('chk_odometro').value)||null,
-      itens, fotos_evidencia: { frontal:chk.fotos._frontal, traseira:chk.fotos._traseira, painel:chk.fotos._painel },
-      resultado: worst==='critica' ? 'bloqueado' : worst==='nc_moderada' ? 'pendente_validacao' : 'liberado',
-      alertas
-    };
-    const saved = await DB.put('checklists', null, dados);
-    const v = DB.get('veiculos', chk.veiculoId);
-
-    if (worst === 'critica'){
-      v.dados.situacao = 'bloqueado';
-      await DB.put('veiculos', v.id, v.dados);
-      UTIL.addTimeline(v.id, 'bloqueio_critico', 'Checklist com item crítico — veículo bloqueado automaticamente');
-      // cria OS automática
-      const numero = 'OS-'+Date.now().toString().slice(-6);
-      await DB.put('ordens', null, {
-        numero, veiculo_id: v.id, tipo:'corretiva', prioridade:'alta', solicitante:(AUTH.perfil()||{}).nome||'Checklist',
-        status:'aberta', tipo_oficina:'interna', etapa:'aguardando_diagnostico', data_entrada:new Date().toISOString(),
-        motivo_entrada:'Item crítico no checklist diário', tarefas:[], pecas:[], mao_obra:[], historico_previsao:[],
-        fotos_execucao:{antes:[],durante:[],depois:[]}
-      });
-      UI.toast('🚫 Veículo BLOQUEADO — OS aberta e equipe notificada (SESMT/Frota).');
-    } else if (worst === 'nc_moderada'){
-      await DB.put('ocorrencias', null, { veiculo_id:v.id, origem:'checklist', criticidade:'moderada',
-        descricao:'Não conformidade moderada em checklist', status:'aberta' });
-      UI.toast('🟡 NC moderada registrada — aguarda validação do gestor antes da saída.');
-    } else if (worst === 'nc_leve'){
-      const prazo = new Date(); prazo.setDate(prazo.getDate()+3);
-      await DB.put('ocorrencias', null, { veiculo_id:v.id, origem:'checklist', criticidade:'leve',
-        descricao:'Não conformidade leve em checklist', prazo:prazo.toISOString().slice(0,10), status:'aberta' });
-      UI.toast('✅ Checklist liberado — ocorrência leve registrada com prazo.');
-    } else {
-      UI.toast('✅ Checklist conforme — veículo liberado.');
-    }
-    if (alertas.length) UI.toast('⚠️ Alerta antifraude: '+alertas.join(', '));
-    UI.closeModal(); ROUTER.render();
-  },
-
-  /* -------------------- PREVENTIVA -------------------- */
-  renderPreventiva(){
-    const planos = STATE.planos_preventivos;
-    return `
-      <div class="row" style="margin-bottom:10px"><button class="btn" onclick="UI.openPlanoForm()">+ Novo plano preventivo</button></div>
-      <div class="card">
-        ${planos.length===0?'<div class="small">Nenhum plano cadastrado.</div>':planos.map(p=>{
-          const v = DB.get('veiculos', p.dados.veiculo_id);
-          const status = UI.statusPlano(p, v);
-          return `<div class="list-item">
-            <div><div style="font-weight:700">${v?v.dados.prefixo:'?'} — ${p.dados.servico}</div>
-            <div class="small">Gatilho: ${p.dados.gatilho_valor} ${p.dados.gatilho_tipo}</div></div>
-            <div>
-              <span class="pill ${status==='vencido'?'bloqueado':status==='proximo'?'aguardando_peca':'disponivel'}">${status}</span>
-              <button class="btn sm ghost" onclick="UI.executarPlano('${p.id}')">Executar</button>
-            </div></div>`;
-        }).join('')}
-      </div>
-    `;
-  },
-  statusPlano(p, v){
-    if (!v) return 'em_dia';
-    if (p.dados.gatilho_tipo==='km' && v.dados.odometro){
-      const restante = (p.dados.proximo_km||p.dados.gatilho_valor) - v.dados.odometro;
-      if (restante <= 0) return 'vencido'; if (restante <= 500) return 'proximo'; return 'em_dia';
-    }
-    if (p.dados.gatilho_tipo==='tempo' && p.dados.proxima_data){
-      const diff = UTIL.daysBetween(UTIL.today(), p.dados.proxima_data);
-      if (diff <= 0) return 'vencido'; if (diff <= 7) return 'proximo'; return 'em_dia';
-    }
-    return 'em_dia';
-  },
-  openPlanoForm(){
-    const veiculos = STATE.veiculos;
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>Novo plano preventivo</h3>
-      <label>Veículo</label><select id="pp_v">${veiculos.map(v=>`<option value="${v.id}">${v.dados.prefixo} · ${v.dados.placa}</option>`).join('')}</select>
-      <label>Serviço</label><input id="pp_servico" placeholder="Troca de óleo, revisão de freios...">
-      <label>Gatilho</label>
-      <select id="pp_tipo"><option value="km">Quilometragem</option><option value="tempo">Tempo (dias)</option></select>
-      <label>Valor do gatilho (km ou dias)</label><input id="pp_valor" type="number">
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.savePlano()">Salvar</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  async savePlano(){
-    const veiculoId = document.getElementById('pp_v').value;
-    const tipo = document.getElementById('pp_tipo').value;
-    const valor = parseFloat(document.getElementById('pp_valor').value);
-    const v = DB.get('veiculos', veiculoId);
-    const dados = { veiculo_id: veiculoId, servico: document.getElementById('pp_servico').value,
-      gatilho_tipo: tipo, gatilho_valor: valor,
-      proximo_km: tipo==='km' ? (v.dados.odometro||0)+valor : null,
-      proxima_data: tipo==='tempo' ? new Date(Date.now()+valor*86400000).toISOString().slice(0,10) : null };
-    await DB.put('planos_preventivos', null, dados);
-    UI.closeModal(); ROUTER.render();
-  },
-  async executarPlano(id){
-    const p = DB.get('planos_preventivos', id);
-    const v = DB.get('veiculos', p.dados.veiculo_id);
-    if (p.dados.gatilho_tipo==='km'){ p.dados.proximo_km = (v.dados.odometro||0) + p.dados.gatilho_valor; }
-    else { p.dados.proxima_data = new Date(Date.now()+p.dados.gatilho_valor*86400000).toISOString().slice(0,10); }
-    p.dados.ultima_execucao_data = UTIL.today();
-    await DB.put('planos_preventivos', id, p.dados);
-    UTIL.addTimeline(v.id, 'preventiva', 'Execução registrada: '+p.dados.servico);
-    UI.toast('Execução registrada, próximo vencimento recalculado.');
-    ROUTER.render();
-  },
-
-  /* -------------------- OFICINA / VEÍCULOS PARADOS (KANBAN) -------------------- */
-  ETAPAS: ['aguardando_diagnostico','orcamento','aprovacao','peca','execucao','teste','liberacao'],
-  renderParados(){
-    const abertas = STATE.ordens.filter(o=>!o.dados.saida || !o.dados.saida.data);
-    const hoje = UTIL.today();
-    const cols = UI.ETAPAS.map(etapa=>{
-      const os = abertas.filter(o=>o.dados.etapa===etapa);
-      return `<div class="kcol"><h4>${UTIL.etapaLabel(etapa)}<span>${os.length}</span></h4>
-        ${os.map(o=>{
-          const v = DB.get('veiculos', o.dados.veiculo_id);
-          const dias = UTIL.daysBetween(o.dados.data_entrada, hoje);
-          const atrasado = o.dados.previsao_saida && o.dados.previsao_saida.data && o.dados.previsao_saida.data < hoje;
-          return `<div class="kcard" onclick="UI.openOS('${o.id}')">
-            <div class="p">${v?v.dados.prefixo:'?'} · ${v?v.dados.placa:''}</div>
-            <div class="small">${o.dados.tipo_oficina==='interna'?'Oficina interna':'Oficina externa'}</div>
-            <div class="${atrasado?'atraso':''}">${dias}d parado ${o.dados.previsao_saida&&o.dados.previsao_saida.data?'· Previsão '+UTIL.fmtDate(o.dados.previsao_saida.data):'· sem previsão'}</div>
-          </div>`;
-        }).join('')}
-      </div>`;
-    }).join('');
-    return `
-      <div class="row" style="margin-bottom:10px"><button class="btn" onclick="UI.openOSForm()">+ Nova OS / Entrada em oficina</button></div>
-      <div class="kanban">${cols}</div>
-    `;
-  },
-  openOSForm(){
-    const veiculos = STATE.veiculos;
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>Nova ordem de serviço</h3>
-      <label>Veículo</label><select id="os_v">${veiculos.map(v=>`<option value="${v.id}">${v.dados.prefixo} · ${v.dados.placa}</option>`).join('')}</select>
-      <div class="row">
-        <div><label>Tipo</label><select id="os_tipo"><option value="corretiva">Corretiva</option><option value="preventiva">Preventiva</option><option value="preditiva">Preditiva</option></select></div>
-        <div><label>Prioridade</label><select id="os_prioridade"><option value="alta">Alta</option><option value="media">Média</option><option value="baixa">Baixa</option></select></div>
-      </div>
-      <div class="row">
-        <div><label>Tipo de oficina</label><select id="os_oficina_tipo"><option value="interna">Interna</option><option value="externa">Externa</option></select></div>
-        <div><label>Nome da oficina</label><input id="os_oficina_nome"></div>
-      </div>
-      <label>Motivo de entrada</label><textarea id="os_motivo" rows="2"></textarea>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.saveOS()">Registrar entrada</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  async saveOS(){
-    const veiculoId = document.getElementById('os_v').value;
-    const numero = 'OS-'+Date.now().toString().slice(-6);
-    const dados = {
-      numero, veiculo_id: veiculoId, tipo: document.getElementById('os_tipo').value,
-      prioridade: document.getElementById('os_prioridade').value, status:'aberta',
-      tipo_oficina: document.getElementById('os_oficina_tipo').value, oficina_nome: document.getElementById('os_oficina_nome').value,
-      etapa:'aguardando_diagnostico', data_entrada:new Date().toISOString(), motivo_entrada: document.getElementById('os_motivo').value,
-      tarefas:[], pecas:[], mao_obra:[], historico_previsao:[], fotos_execucao:{antes:[],durante:[],depois:[]}
-    };
-    await DB.put('ordens', null, dados);
-    const v = DB.get('veiculos', veiculoId);
-    v.dados.situacao = dados.tipo_oficina==='interna' ? 'oficina_interna' : 'oficina_externa';
-    await DB.put('veiculos', veiculoId, v.dados);
-    UTIL.addTimeline(veiculoId, 'entrada_oficina', 'Entrada em oficina '+dados.tipo_oficina+' — '+dados.motivo_entrada);
-    UI.closeModal(); ROUTER.render();
-  },
-  openOS(id){
-    const o = DB.get('ordens', id); const d = o.dados; const v = DB.get('veiculos', d.veiculo_id);
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>${d.numero} — ${v?v.dados.prefixo:'?'}</h3>
-      <div class="small">${d.tipo} · prioridade ${d.prioridade} · ${d.tipo_oficina}</div>
-      <label>Etapa atual</label>
-      <select id="os_etapa">${UI.ETAPAS.map(e=>`<option value="${e}" ${d.etapa===e?'selected':''}>${UTIL.etapaLabel(e)}</option>`).join('')}</select>
-      <label>Diagnóstico</label><textarea id="os_diag" rows="2">${d.diagnostico||''}</textarea>
-      <div class="row">
-        <div><label>Previsão de saída</label><input type="date" id="os_prev" value="${d.previsao_saida?d.previsao_saida.data:''}"></div>
-        <div><label>Motivo (se alterar)</label><input id="os_prev_motivo" placeholder="obrigatório se mudar"></div>
-      </div>
-      <div class="small">Histórico de previsão: ${(d.historico_previsao||[]).map(h=>`${UTIL.fmtDate(h.de)}→${UTIL.fmtDate(h.para)} (${h.motivo})`).join(' · ')||'—'}</div>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.saveOSProgress('${id}')">Salvar progresso</button>
-        ${d.etapa==='liberacao'?`<button class="btn danger" onclick="UI.liberarOS('${id}')">Liberar veículo</button>`:''}
-        <button class="btn ghost" onclick="UI.closeModal()">Fechar</button>
-      </div>
-    `);
-  },
-  async saveOSProgress(id){
-    const o = DB.get('ordens', id); const d = o.dados;
-    const novaEtapa = document.getElementById('os_etapa').value;
-    const novaPrev = document.getElementById('os_prev').value;
-    const motivo = document.getElementById('os_prev_motivo').value;
-    if (novaPrev && d.previsao_saida && novaPrev !== d.previsao_saida.data && !motivo){
-      UI.toast('Informe o motivo da alteração da previsão de saída'); return;
-    }
-    if (novaPrev && (!d.previsao_saida || novaPrev !== d.previsao_saida.data)){
-      d.historico_previsao = d.historico_previsao || [];
-      d.historico_previsao.push({ de: d.previsao_saida?d.previsao_saida.data:null, para:novaPrev, motivo: motivo||'Definição inicial', usuario:(AUTH.perfil()||{}).nome, ts:new Date().toISOString() });
-      d.previsao_saida = { data: novaPrev, confianca:'media' };
-    }
-    d.etapa = novaEtapa; d.diagnostico = document.getElementById('os_diag').value;
-    await DB.put('ordens', id, d);
-    UTIL.addTimeline(d.veiculo_id, 'os_progresso', 'OS '+d.numero+' → '+UTIL.etapaLabel(novaEtapa));
-    UI.closeModal(); ROUTER.render();
-  },
-  async liberarOS(id){
-    const o = DB.get('ordens', id); const d = o.dados;
-    d.saida = { data:new Date().toISOString(), aprovador:(AUTH.perfil()||{}).nome };
-    await DB.put('ordens', id, d);
-    const v = DB.get('veiculos', d.veiculo_id);
-    v.dados.situacao = 'disponivel';
-    await DB.put('veiculos', d.veiculo_id, v.dados);
-    UTIL.addTimeline(d.veiculo_id, 'liberacao', 'Veículo liberado da oficina — OS '+d.numero);
-    UI.toast('✅ Veículo liberado e disponível novamente.');
-    UI.closeModal(); ROUTER.render();
-  },
-
-  /* -------------------- FORNECEDORES -------------------- */
-  renderFornecedores(){
-    const list = STATE.fornecedores;
-    const ranking = list.map(f=>({ f, score: UI.scoreFornecedor(f) })).sort((a,b)=>b.score-a.score);
-    return `
-      <div class="row" style="margin-bottom:10px"><button class="btn" onclick="UI.openFornecedorForm()">+ Novo fornecedor</button></div>
-      <h2 class="sec">Ranking automático</h2>
-      <div class="card">
-        ${ranking.length===0?'<div class="small">Nenhum fornecedor cadastrado.</div>':ranking.map((r,i)=>`
-          <div class="list-item"><span>${i+1}º · ${r.f.dados.razao_social}</span>
-          <span class="pill ${r.score>=70?'disponivel':r.score>=40?'aguardando_peca':'bloqueado'}">${r.score} pts</span></div>`).join('')}
-      </div>
-      <h2 class="sec">Cadastro</h2>
-      <div class="card">
-        ${list.map(f=>`<div class="list-item" style="cursor:pointer" onclick="UI.openFornecedorForm('${f.id}')">
-          <div><div style="font-weight:700">${f.dados.razao_social}</div><div class="small">${f.dados.cnpj||''} · ${f.dados.especialidades||''}</div></div>
-          <span class="pill ${f.dados.homologado?'disponivel':'aguardando_orcamento'}">${f.dados.homologado?'Homologado':'Não homologado'}</span></div>`).join('') || '<div class="small">—</div>'}
-      </div>
-    `;
-  },
-  scoreFornecedor(f){
-    const osRel = STATE.ordens.filter(o=>o.dados.oficina_nome===f.dados.razao_social && o.dados.tipo_oficina==='externa' && o.dados.saida);
-    if (!osRel.length) return 50;
-    let pontos = 50;
-    osRel.forEach(o=>{
-      const prevista = o.dados.previsao_saida && o.dados.previsao_saida.data;
-      const real = o.dados.saida.data.slice(0,10);
-      if (prevista){ pontos += (real <= prevista) ? 8 : -8; }
-      if (o.dados.retrabalho) pontos -= 10;
-    });
-    return Math.max(0, Math.min(100, Math.round(pontos/osRel.length*osRel.length/Math.max(1,osRel.length)) + Math.round(pontos-50)));
-  },
-  openFornecedorForm(id){
-    const f = id ? DB.get('fornecedores', id) : { dados:{} }; const d = f.dados;
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>${id?'Editar':'Novo'} fornecedor</h3>
-      <label>Razão social</label><input id="fn_razao" value="${d.razao_social||''}">
-      <div class="row"><div><label>CNPJ</label><input id="fn_cnpj" value="${d.cnpj||''}"></div>
-      <div><label>Contato</label><input id="fn_contato" value="${d.contatos||''}"></div></div>
-      <label>Especialidades / serviços</label><input id="fn_esp" value="${d.especialidades||''}">
-      <div class="row"><div><label>Cobertura (cidades)</label><input id="fn_cobertura" value="${d.cobertura||''}"></div>
-      <div><label>SLA prazo (dias)</label><input id="fn_sla" type="number" value="${d.sla_prazo_dias||''}"></div></div>
-      <label><input type="checkbox" id="fn_homologado" style="width:auto" ${d.homologado?'checked':''}> Homologado</label>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.saveFornecedor('${id||''}')">Salvar</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  async saveFornecedor(id){
-    const g = x=>document.getElementById(x).value;
-    const dados = { razao_social:g('fn_razao'), cnpj:g('fn_cnpj'), contatos:g('fn_contato'), especialidades:g('fn_esp'),
-      cobertura:g('fn_cobertura'), sla_prazo_dias:parseInt(g('fn_sla'))||null, homologado: document.getElementById('fn_homologado').checked };
-    await DB.put('fornecedores', id||null, dados); UI.closeModal(); ROUTER.render();
-  },
-
-  /* -------------------- PEÇAS / ESTOQUE -------------------- */
-  renderEstoque(){
-    const list = STATE.pecas;
-    return `
-      <div class="row" style="margin-bottom:10px"><button class="btn" onclick="UI.openPecaForm()">+ Nova peça</button></div>
-      <div class="card">
-        ${list.length===0?'<div class="small">Nenhuma peça cadastrada.</div>':list.map(p=>{
-          const d=p.dados; const baixo = (d.saldo||0) <= (d.minimo||0);
-          return `<div class="list-item">
-            <div><div style="font-weight:700">${d.descricao}</div><div class="small">Cód. ${d.codigo_interno||'—'} · saldo ${d.saldo||0} ${d.unidade||'un'}</div></div>
-            <div><span class="pill ${baixo?'bloqueado':'disponivel'}">${baixo?'Ruptura':'OK'}</span>
-            <button class="btn sm ghost" onclick="UI.openMovimento('${p.id}')">Movimentar</button></div></div>`;
-        }).join('')}
-      </div>
-    `;
-  },
-  openPecaForm(){
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>Nova peça</h3>
-      <div class="row"><div><label>Código interno</label><input id="pc_cod"></div>
-      <div><label>Código fabricante</label><input id="pc_codfab"></div></div>
-      <label>Descrição</label><input id="pc_desc">
-      <div class="row"><div><label>Unidade</label><input id="pc_un" value="un"></div>
-      <div><label>Custo unitário</label><input id="pc_custo" type="number"></div></div>
-      <div class="row"><div><label>Saldo inicial</label><input id="pc_saldo" type="number" value="0"></div>
-      <div><label>Mínimo</label><input id="pc_min" type="number" value="0"></div></div>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.savePeca()">Salvar</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  async savePeca(){
-    const g = x=>document.getElementById(x).value;
-    const dados = { codigo_interno:g('pc_cod'), codigo_fabricante:g('pc_codfab'), descricao:g('pc_desc'),
-      unidade:g('pc_un'), custo_unit:parseFloat(g('pc_custo'))||0, saldo:parseFloat(g('pc_saldo'))||0,
-      minimo:parseFloat(g('pc_min'))||0, movimentacoes:[] };
-    await DB.put('pecas', null, dados); UI.closeModal(); ROUTER.render();
-  },
-  openMovimento(id){
-    const p = DB.get('pecas', id);
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>Movimentar: ${p.dados.descricao}</h3>
-      <div class="small">Saldo atual: ${p.dados.saldo} ${p.dados.unidade}</div>
-      <label>Tipo</label><select id="mv_tipo"><option value="entrada">Entrada</option><option value="saida">Saída (aplicada em OS)</option><option value="ajuste">Ajuste de inventário</option></select>
-      <label>Quantidade</label><input id="mv_qtd" type="number">
-      <label>Motivo</label><input id="mv_motivo">
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.saveMovimento('${id}')">Confirmar</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  async saveMovimento(id){
-    const p = DB.get('pecas', id); const tipo = document.getElementById('mv_tipo').value;
-    const qtd = parseFloat(document.getElementById('mv_qtd').value)||0;
-    const motivo = document.getElementById('mv_motivo').value;
-    p.dados.saldo = tipo==='saida' ? (p.dados.saldo - qtd) : tipo==='entrada' ? (p.dados.saldo + qtd) : qtd;
-    p.dados.movimentacoes = p.dados.movimentacoes || [];
-    p.dados.movimentacoes.unshift({ tipo, qtd, motivo, data:new Date().toISOString() });
-    await DB.put('pecas', id, p.dados);
-    if (p.dados.saldo <= p.dados.minimo) UI.toast('⚠️ Estoque abaixo do mínimo: '+p.dados.descricao);
-    UI.closeModal(); ROUTER.render();
-  },
-
-  /* -------------------- PNEUS -------------------- */
-  renderPneus(){
-    const list = STATE.pneus;
-    return `
-      <div class="row" style="margin-bottom:10px"><button class="btn" onclick="UI.openPneuForm()">+ Novo pneu</button></div>
-      <div class="card">
-        ${list.length===0?'<div class="small">Nenhum pneu cadastrado.</div>':list.map(p=>{
-          const d=p.dados; const v = DB.get('veiculos', d.veiculo_id);
-          const desgaste = d.profundidade_sulco!=null && d.profundidade_sulco < 3;
-          return `<div class="list-item">
-            <div><div style="font-weight:700">${d.marca||''} ${d.modelo||''} — DOT ${d.dot||'—'}</div>
-            <div class="small">${v?v.dados.prefixo:'estoque'} · posição ${d.posicao||'—'} · sulco ${d.profundidade_sulco??'—'}mm</div></div>
-            <span class="pill ${desgaste?'bloqueado':'disponivel'}">${desgaste?'Desgaste':d.status||'em_uso'}</span></div>`;
-        }).join('')}
-      </div>
-    `;
-  },
-  openPneuForm(){
-    const veiculos = STATE.veiculos;
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>Novo pneu</h3>
-      <div class="row"><div><label>Marca</label><input id="pn_marca"></div><div><label>Modelo</label><input id="pn_modelo"></div></div>
-      <div class="row"><div><label>DOT</label><input id="pn_dot"></div><div><label>Medida</label><input id="pn_medida"></div></div>
-      <label>Veículo (opcional — vazio = estoque)</label>
-      <select id="pn_v"><option value="">— estoque —</option>${veiculos.map(v=>`<option value="${v.id}">${v.dados.prefixo}</option>`).join('')}</select>
-      <div class="row"><div><label>Posição (ex: dianteiro esq.)</label><input id="pn_pos"></div>
-      <div><label>Profundidade do sulco (mm)</label><input id="pn_sulco" type="number"></div></div>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.savePneu()">Salvar</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  async savePneu(){
-    const g = x=>document.getElementById(x).value;
-    const dados = { marca:g('pn_marca'), modelo:g('pn_modelo'), dot:g('pn_dot'), medida:g('pn_medida'),
-      veiculo_id:g('pn_v')||null, posicao:g('pn_pos'), profundidade_sulco:parseFloat(g('pn_sulco'))||null,
-      status: g('pn_v')?'em_uso':'estoque', historico_posicoes:[] };
-    await DB.put('pneus', null, dados); UI.closeModal(); ROUTER.render();
-  },
-
-  /* -------------------- COMBUSTÍVEL -------------------- */
-  renderCombustivel(){
-    const list = STATE.abastecimentos;
-    return `
-      <div class="row" style="margin-bottom:10px"><button class="btn" onclick="UI.openAbastecimentoForm()">+ Novo abastecimento</button></div>
-      <div class="card">
-        ${list.length===0?'<div class="small">Nenhum abastecimento registrado.</div>':list.slice(0,20).map(a=>{
-          const d=a.dados; const v = DB.get('veiculos', d.veiculo_id);
-          return `<div class="list-item">
-            <div><div style="font-weight:700">${v?v.dados.prefixo:'?'} · ${d.litros}L · R$${(d.valor||0).toFixed(2)}</div>
-            <div class="small">${UTIL.fmtDate(d.data_hora)} · ${d.km_l?d.km_l.toFixed(1)+' km/L':''}</div></div>
-            ${d.anomalias&&d.anomalias.length?`<span class="pill bloqueado">${d.anomalias.length} alerta(s)</span>`:'<span class="pill disponivel">OK</span>'}</div>`;
-        }).join('')}
-      </div>
-    `;
-  },
-  openAbastecimentoForm(){
-    const veiculos = STATE.veiculos;
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>Novo abastecimento</h3>
-      <label>Veículo</label><select id="ab_v">${veiculos.map(v=>`<option value="${v.id}">${v.dados.prefixo} · ${v.dados.placa}</option>`).join('')}</select>
-      <div class="row"><div><label>Odômetro atual</label><input id="ab_odo" type="number"></div>
-      <div><label>Litros</label><input id="ab_litros" type="number" step="0.01"></div></div>
-      <div class="row"><div><label>Preço por litro</label><input id="ab_preco" type="number" step="0.01"></div>
-      <div><label>Posto</label><input id="ab_posto"></div></div>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.saveAbastecimento()">Salvar</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  async saveAbastecimento(){
-    const veiculoId = document.getElementById('ab_v').value;
-    const odometro = parseFloat(document.getElementById('ab_odo').value)||0;
-    const litros = parseFloat(document.getElementById('ab_litros').value)||0;
-    const preco = parseFloat(document.getElementById('ab_preco').value)||0;
-    const anteriores = STATE.abastecimentos.filter(a=>a.dados.veiculo_id===veiculoId).sort((a,b)=>(b.dados.odometro||0)-(a.dados.odometro||0));
-    const anterior = anteriores[0];
-    const anomalias = [];
-    let kml = null;
-    if (anterior){
-      if (odometro <= anterior.dados.odometro){ anomalias.push('odometro_inconsistente'); }
-      else { kml = (odometro - anterior.dados.odometro) / (litros||1);
-        if (anterior.dados.km_l && kml < anterior.dados.km_l*0.7) anomalias.push('queda_abrupta_media'); }
-      const minutos = (new Date() - new Date(anterior.dados.data_hora))/60000;
-      if (minutos < 30 && Math.abs(odometro-anterior.dados.odometro) < 5) anomalias.push('abastecimento_duplicado');
-    }
-    const mediaPrecos = STATE.abastecimentos.length ? STATE.abastecimentos.reduce((s,a)=>s+(a.dados.preco_litro||0),0)/STATE.abastecimentos.length : preco;
-    if (mediaPrecos && Math.abs(preco-mediaPrecos)/mediaPrecos > 0.3) anomalias.push('preco_fora_da_faixa');
-    const dados = { veiculo_id:veiculoId, condutor:(AUTH.perfil()||{}).nome, data_hora:new Date().toISOString(),
-      odometro, litros, preco_litro:preco, valor: +(litros*preco).toFixed(2), posto:document.getElementById('ab_posto').value,
-      km_l: kml, anomalias };
-    await DB.put('abastecimentos', null, dados);
-    const v = DB.get('veiculos', veiculoId); if (v){ v.dados.odometro = Math.max(v.dados.odometro||0, odometro); DB.put('veiculos', veiculoId, v.dados); }
-    if (anomalias.length) UI.toast('⚠️ Anomalia detectada: '+anomalias.join(', '));
-    UI.closeModal(); ROUTER.render();
-  },
-
-  /* -------------------- DOCUMENTOS E MULTAS -------------------- */
-  renderDocumentos(){
-    const docs = STATE.documentos;
-    const hoje = UTIL.today();
-    const withStatus = docs.map(d=>{
-      const dias = d.dados.validade ? UTIL.daysBetween(hoje, d.dados.validade) : null;
-      let nivel = 'ok';
-      if (dias!=null){ if (dias<0) nivel='vencido'; else if (dias<=7) nivel='7'; else if (dias<=15) nivel='15'; else if (dias<=30) nivel='30'; else if (dias<=60) nivel='60'; else if (dias<=90) nivel='90'; }
-      return { d, dias, nivel };
-    }).sort((a,b)=>(a.dias??999)-(b.dias??999));
-    const multas = STATE.multas;
-    return `
-      <div class="row" style="margin-bottom:10px">
-        <button class="btn" onclick="UI.openDocumentoForm()">+ Documento</button>
-        <button class="btn sec" onclick="UI.openMultaForm()">+ Multa</button>
-      </div>
-      <h2 class="sec">Documentos (alertas 90/60/30/15/7 dias)</h2>
-      <div class="card">
-        ${withStatus.length===0?'<div class="small">Nenhum documento cadastrado.</div>':withStatus.map(({d,dias,nivel})=>{
-          const v = DB.get('veiculos', d.dados.veiculo_id);
-          const pill = nivel==='vencido'?'bloqueado':(nivel==='7'||nivel==='15')?'bloqueado':(nivel==='30'||nivel==='60')?'aguardando_peca':'disponivel';
-          return `<div class="list-item"><div><div style="font-weight:700">${d.dados.tipo} — ${v?v.dados.prefixo:'?'}</div>
-          <div class="small">Validade ${UTIL.fmtDate(d.dados.validade)}</div></div>
-          <span class="pill ${pill}">${dias==null?'—':dias<0?Math.abs(dias)+'d vencido':dias+'d restantes'}</span></div>`;
-        }).join('')}
-      </div>
-      <h2 class="sec">Multas</h2>
-      <div class="card">
-        ${multas.length===0?'<div class="small">Nenhuma multa registrada.</div>':multas.map(m=>{
-          const v = DB.get('veiculos', m.dados.veiculo_id);
-          return `<div class="list-item"><span>${v?v.dados.prefixo:'?'} — ${m.dados.infracao}</span>
-          <span class="pill ${m.dados.status==='paga'?'disponivel':'aguardando_orcamento'}">${m.dados.status}</span></div>`;
-        }).join('')}
-      </div>
-    `;
-  },
-  openDocumentoForm(){
-    const veiculos = STATE.veiculos;
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>Novo documento</h3>
-      <label>Veículo</label><select id="dc_v">${veiculos.map(v=>`<option value="${v.id}">${v.dados.prefixo}</option>`).join('')}</select>
-      <div class="row"><div><label>Tipo</label><input id="dc_tipo" placeholder="CRLV, seguro, tacógrafo..."></div>
-      <div><label>Validade</label><input id="dc_validade" type="date"></div></div>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.saveDocumento()">Salvar</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  async saveDocumento(){
-    const dados = { veiculo_id: document.getElementById('dc_v').value, tipo: document.getElementById('dc_tipo').value,
-      validade: document.getElementById('dc_validade').value };
-    await DB.put('documentos', null, dados); UI.closeModal(); ROUTER.render();
-  },
-  openMultaForm(){
-    const veiculos = STATE.veiculos; const condutores = STATE.condutores;
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>Nova multa</h3>
-      <label>Veículo</label><select id="mt_v">${veiculos.map(v=>`<option value="${v.id}">${v.dados.prefixo}</option>`).join('')}</select>
-      <label>Condutor responsável</label><select id="mt_c"><option value="">—</option>${condutores.map(c=>`<option value="${c.id}">${c.dados.nome||c.id.slice(0,6)}</option>`).join('')}</select>
-      <div class="row"><div><label>Infração</label><input id="mt_infracao"></div>
-      <div><label>Valor</label><input id="mt_valor" type="number"></div></div>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.saveMulta()">Salvar</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  async saveMulta(){
-    const dados = { veiculo_id: document.getElementById('mt_v').value, condutor_id: document.getElementById('mt_c').value||null,
-      infracao: document.getElementById('mt_infracao').value, valor: parseFloat(document.getElementById('mt_valor').value)||0,
-      status:'pendente', data:new Date().toISOString() };
-    await DB.put('multas', null, dados); UI.closeModal(); ROUTER.render();
-  },
-
-  /* -------------------- CUSTOS / ORÇAMENTO / TCO -------------------- */
-  renderCustos(){
-    const custoOS = STATE.ordens.reduce((s,o)=>s+((o.dados.custos&&o.dados.custos.total)||0),0);
-    const custoComb = STATE.abastecimentos.reduce((s,a)=>s+(a.dados.valor||0),0);
-    const custoPneus = STATE.pneus.reduce((s,p)=>s+(p.dados.custo||0),0);
-    const custoMultas = STATE.multas.reduce((s,m)=>s+(m.dados.valor||0),0);
-    const total = custoOS+custoComb+custoPneus+custoMultas;
-    const kmTotal = STATE.veiculos.reduce((s,v)=>s+(v.dados.odometro||0),0) || 1;
-    const custoKm = total/kmTotal;
-    // por centro de custo
-    const porCC = {};
-    function add(cc, valor){ porCC[cc||'Não informado'] = (porCC[cc||'Não informado']||0)+valor; }
-    STATE.ordens.forEach(o=>{ const v=DB.get('veiculos', o.dados.veiculo_id); add(v&&v.dados.centro_custo, (o.dados.custos&&o.dados.custos.total)||0); });
-    STATE.abastecimentos.forEach(a=>{ const v=DB.get('veiculos', a.dados.veiculo_id); add(v&&v.dados.centro_custo, a.dados.valor||0); });
-    return `
-      <h2 class="sec">Visão geral</h2>
-      <div class="grid kpi-grid">
-        <div class="kpi"><div class="n">R$ ${total.toFixed(0)}</div><div class="l">Custo total (histórico)</div></div>
-        <div class="kpi"><div class="n">R$ ${custoKm.toFixed(2)}</div><div class="l">Custo por km</div></div>
-        <div class="kpi warn"><div class="n">R$ ${custoOS.toFixed(0)}</div><div class="l">Manutenção (OS)</div></div>
-        <div class="kpi"><div class="n">R$ ${custoComb.toFixed(0)}</div><div class="l">Combustível</div></div>
-        <div class="kpi"><div class="n">R$ ${custoPneus.toFixed(0)}</div><div class="l">Pneus</div></div>
-        <div class="kpi bad"><div class="n">R$ ${custoMultas.toFixed(0)}</div><div class="l">Multas</div></div>
-      </div>
-      <h2 class="sec">Custo por centro de custo</h2>
-      <div class="card">
-        ${Object.entries(porCC).length===0?'<div class="small">Sem dados suficientes ainda.</div>':Object.entries(porCC).map(([cc,v])=>
-          `<div class="list-item"><span>${cc}</span><span>R$ ${v.toFixed(2)}</span></div>`).join('')}
-      </div>
-      <h2 class="sec">TCO — manter, substituir ou locar</h2>
-      <div class="card">
-        ${STATE.veiculos.filter(v=>v.dados.valor_aquisicao).length===0 ? '<div class="small">Cadastre o valor de aquisição na ficha do veículo para habilitar esta análise.</div>' :
-          STATE.veiculos.filter(v=>v.dados.valor_aquisicao).map(v=>{
-            const custoOSv = STATE.ordens.filter(o=>o.dados.veiculo_id===v.id).reduce((s,o)=>s+((o.dados.custos&&o.dados.custos.total)||0),0);
-            const custoCombv = STATE.abastecimentos.filter(a=>a.dados.veiculo_id===v.id).reduce((s,a)=>s+(a.dados.valor||0),0);
-            const custoPneusv = STATE.pneus.filter(p=>p.dados.veiculo_id===v.id).reduce((s,p)=>s+(p.dados.custo||0),0);
-            const acumulado = custoOSv+custoCombv+custoPneusv;
-            const pct = acumulado / v.dados.valor_aquisicao;
-            const idade = v.dados.data_aquisicao ? (UTIL.daysBetween(v.dados.data_aquisicao, UTIL.today())/365) : null;
-            let rec = 'Manter', cls='disponivel';
-            if (pct > 0.6 || (idade && idade > 8)){ rec='Avaliar substituição'; cls='bloqueado'; }
-            else if (pct > 0.3){ rec='Monitorar'; cls='aguardando_peca'; }
-            return `<div class="list-item"><div><div style="font-weight:700">${v.dados.prefixo}</div>
-            <div class="small">Custo acumulado R$ ${acumulado.toFixed(0)} (${(pct*100).toFixed(0)}% do valor de aquisição)${idade?' · '+idade.toFixed(1)+' anos':''}</div></div>
-            <span class="pill ${cls}">${rec}</span></div>`;
-          }).join('')}
-      </div>
-      <div class="small" style="margin-top:6px">Heurística simples (custo acumulado vs. valor de aquisição + idade). Um TCO financeiro completo (depreciação real, valor residual de mercado, custo de capital) é um refinamento de P3.</div>
-    `;
-  },
-
-  /* -------------------- COTAÇÕES (com aprovação por alçada) -------------------- */
-  renderCotacoes(){
-    const list = STATE.cotacoes;
-    return `
-      <div class="row" style="margin-bottom:10px"><button class="btn" onclick="UI.openCotacaoForm()">+ Nova cotação</button></div>
-      <div class="small" style="margin-bottom:10px">Alçada: até R$ ${ALCADA_LIMITE} aprova Encarregado/Gestor; acima disso, só Gestor/Gerência.</div>
-      <div class="card">
-        ${list.length===0?'<div class="small">Nenhuma cotação registrada.</div>':list.map(c=>{
-          const d=c.dados; const podeAprovar = d.status==='pendente' && AUTH.podeAprovarValor(d.valor);
-          return `<div class="list-item">
-            <div><div style="font-weight:700">${d.descricao} — R$ ${d.valor.toFixed(2)}</div>
-            <div class="small">${d.fornecedor||'—'} · prazo ${d.prazo_dias||'?'}d · ${d.valor>ALCADA_LIMITE?'alçada alta':'alçada baixa'}</div></div>
-            <div>
-              <span class="pill ${d.status==='aprovada'?'disponivel':d.status==='reprovada'?'bloqueado':'aguardando_orcamento'}">${d.status}</span>
-              ${podeAprovar?`<button class="btn sm" onclick="UI.aprovarCotacao('${c.id}',true)">Aprovar</button><button class="btn sm ghost" onclick="UI.aprovarCotacao('${c.id}',false)">Reprovar</button>`
-                : d.status==='pendente' ? '<div class="small">sem alçada p/ aprovar</div>' : ''}
-            </div></div>`;
-        }).join('')}
-      </div>
-    `;
-  },
-  openCotacaoForm(){
-    const fornecedores = STATE.fornecedores;
-    UI.openModal(`
-      <button class="close-x" onclick="UI.closeModal()">✕</button>
-      <h3>Nova cotação</h3>
-      <label>Descrição (peça/serviço)</label><input id="ct_desc">
-      <label>Fornecedor</label><select id="ct_forn"><option value="">— avulso —</option>${fornecedores.map(f=>`<option value="${f.dados.razao_social}">${f.dados.razao_social}</option>`).join('')}</select>
-      <div class="row"><div><label>Valor (R$)</label><input id="ct_valor" type="number" step="0.01"></div>
-      <div><label>Prazo (dias)</label><input id="ct_prazo" type="number"></div></div>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" onclick="UI.saveCotacao()">Enviar para aprovação</button>
-        <button class="btn ghost" onclick="UI.closeModal()">Cancelar</button>
-      </div>
-    `);
-  },
-  async saveCotacao(){
-    const dados = { descricao: document.getElementById('ct_desc').value, fornecedor: document.getElementById('ct_forn').value,
-      valor: parseFloat(document.getElementById('ct_valor').value)||0, prazo_dias: parseInt(document.getElementById('ct_prazo').value)||null,
-      status:'pendente' };
-    await DB.put('cotacoes', null, dados); UI.closeModal(); ROUTER.render();
-  },
-  async aprovarCotacao(id, aprovar){
-    const c = DB.get('cotacoes', id);
-    if (!AUTH.podeAprovarValor(c.dados.valor)){ UI.toast('Sem alçada para este valor'); return; }
-    c.dados.status = aprovar ? 'aprovada' : 'reprovada';
-    c.dados.aprovado_por = (AUTH.perfil()||{}).nome;
-    await DB.put('cotacoes', id, c.dados);
-    UI.toast(aprovar?'✅ Cotação aprovada':'Cotação reprovada'); ROUTER.render();
-  },
-
-  /* -------------------- RISCO DE FALHA (heurístico, sem telemetria real) -------------------- */
-  calcRisco(veiculoId){
-    const hoje = UTIL.today();
-    const os180 = STATE.ordens.filter(o=>o.dados.veiculo_id===veiculoId && UTIL.daysBetween(o.dados.data_entrada, hoje) <= 180);
-    const reaberturas = os180.filter(o=>o.dados.retrabalho).length;
-    const criticos90 = STATE.checklists.filter(c=>c.dados.veiculo_id===veiculoId && c.dados.resultado==='bloqueado' && UTIL.daysBetween(c.dados.data_hora, hoje) <= 90).length;
-    const preventivaVencida = STATE.planos_preventivos.filter(p=>p.dados.veiculo_id===veiculoId).filter(p=>UI.statusPlano(p, DB.get('veiculos',veiculoId))==='vencido').length;
-    return Math.min(100, reaberturas*30 + criticos90*25 + preventivaVencida*20);
-  },
-
-  /* -------------------- PORTAL DO FORNECEDOR (somente leitura) -------------------- */
-  renderPortalFornecedor(){
-    const p = AUTH.perfil();
-    const minhasOS = STATE.ordens.filter(o=>o.dados.oficina_nome===p.fornecedorNome);
-    const minhasCot = STATE.cotacoes.filter(c=>c.dados.fornecedor===p.fornecedorNome);
-    return `
-      <div class="banner">Portal restrito do fornecedor <b>${p.fornecedorNome}</b> — somente leitura + envio de orçamento.</div>
-      <h2 class="sec">Minhas ordens de serviço</h2>
-      <div class="card">${minhasOS.length===0?'<div class="small">Nenhuma OS vinculada a este nome de fornecedor ainda.</div>':minhasOS.map(o=>{
-        const v = DB.get('veiculos', o.dados.veiculo_id);
-        return `<div class="list-item"><span>${v?v.dados.prefixo:'?'} — ${UTIL.etapaLabel(o.dados.etapa)}</span>
-        <span class="small">${o.dados.previsao_saida?UTIL.fmtDate(o.dados.previsao_saida.data):'sem previsão'}</span></div>`;
-      }).join('')}</div>
-      <h2 class="sec">Minhas cotações</h2>
-      <div class="card">${minhasCot.length===0?'<div class="small">Nenhuma cotação enviada.</div>':minhasCot.map(c=>
-        `<div class="list-item"><span>${c.dados.descricao} — R$ ${c.dados.valor.toFixed(2)}</span><span class="pill ${c.dados.status==='aprovada'?'disponivel':c.dados.status==='reprovada'?'bloqueado':'aguardando_orcamento'}">${c.dados.status}</span></div>`).join('')}</div>
-      <div class="row" style="margin-top:10px"><button class="btn" onclick="UI.openCotacaoForm()">+ Enviar orçamento</button></div>
-    `;
-  },
-
-  /* -------------------- CONFIG -------------------- */
-  renderConfig(){
-    const p = AUTH.perfil();
-    const status = AUTH.statusAssinatura();
-    return `
-      <div class="card">
-        <h2 class="sec" style="margin-top:0">Conta</h2>
-        <div>Empresa: <b>${SESSION.empresaNome||'—'}</b></div>
-        <div>Usuário: <b>${SESSION.user?SESSION.user.email.split('@')[0]:'—'}</b></div>
-        <div>Perfil: <b>${p?p.nome:'—'}</b></div>
-        <button class="btn danger" style="margin-top:8px" onclick="AUTH.logout()">Sair</button>
-      </div>
-      <div class="card">
-        <h2 class="sec" style="margin-top:0">Assinatura</h2>
-        <div>Plano: <b>${SESSION.plano==='standard'?'Ativo':SESSION.plano==='suspenso'?'Suspenso':'Teste grátis'}</b></div>
-        <div class="small" style="margin-top:4px">R$ 40,00 por veículo/equipamento cadastrado, por mês.</div>
-        <div class="small">Frota atual: ${STATE.veiculos.length} veículo(s) → mensalidade estimada: <b>R$ ${(STATE.veiculos.length*40).toFixed(2)}</b>/mês.</div>
-        ${SESSION.plano==='trial' ? `<div class="small" style="margin-top:6px">Faltam ${status.diasRestantes>0?status.diasRestantes:0} dia(s) de teste.</div>` : ''}
-      </div>
-      ${SESSION.plano!=='standard' ? UI.blocoPix() : ''}
-      ${AUTH.isGestorOuGerencia() ? UI.renderAdminEquipe() : ''}
-      <div class="card">
-        <h2 class="sec" style="margin-top:0">Roteiro — escopo desta versão (P0 + P1 + P2-lite + Multi-tenant)</h2>
-        <div class="small">✅ P0: Cadastro 360°, checklist com bloqueio crítico, OS/oficina interna e externa, previsão de saída com histórico, painel de veículos parados, agenda preventiva, dashboard executivo.</div>
-        <div class="small" style="margin-top:6px">✅ P1: fornecedores com ranking automático, estoque de peças com alerta de ruptura, pneus por posição/sulco, combustível com detecção de anomalias, documentos com alertas 90/60/30/15/7, multas, custos por centro de custo.</div>
-        <div class="small" style="margin-top:6px">✅ P2 (parte lógica): cotações com aprovação por alçada, portal do fornecedor externo, TCO heurístico, ranking de risco de falha.</div>
-        <div class="small" style="margin-top:6px">✅ Multi-tenant: login por empresa, dados isolados por empresa, pronto para vender o mesmo sistema a múltiplos clientes sem misturar dados.</div>
-        <div class="small" style="margin-top:6px">✅ Onboarding self-service: uma empresa nova cria a própria conta e já entra usando o sistema sozinha.</div>
-        <div class="small" style="margin-top:6px">✅ Cobrança via PIX: toda empresa nova começa com 7 dias de teste grátis; ao vencer, o acesso é bloqueado com uma tela mostrando os dados de pagamento PIX e a mensalidade estimada.</div>
-        <div class="small" style="margin-top:6px">🚫 Ainda não incluído: confirmação automática de pagamento (a liberação após o PIX cair é manual), convite de mais pessoas com perfil diferente dentro da mesma empresa, telemetria/OBD real, ERP, OCR.</div>
-      </div>
-    `;
-  }
-};
-
-/* =========================================================
-   BOOT
-========================================================= */
-const BOOT = {
-  async iniciarAposLogin(){
-    document.getElementById('modalRoot').innerHTML = '';
-    const status = AUTH.statusAssinatura();
-    if (!status.liberado){
-      document.getElementById('main').innerHTML = UI.renderPaywall(status.motivo);
-      document.getElementById('tabs').innerHTML = '';
-      UI.updateHeader();
-      return;
-    }
-    UI.updateHeader();
-    await DB.loadAll();
-    DB.subscribeAll();
-    OFFQ.flush();
-    ROUTER.current = 'dashboard';
-    ROUTER.render();
-  }
-};
-
-(async function boot(){
-  if ('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
-  document.getElementById('netDot').className = navigator.onLine ? 'dot on' : 'dot off';
-
-  const { data:{ session } } = await sb.auth.getSession();
-  if (!session){
-    ROUTER._tela = 'login';
-    UI.renderAuthScreen();
-    return;
-  }
-  const ok = await AUTH.carregarPerfil();
-  if (!ok){
-    document.getElementById('main').innerHTML = UI.renderCompletarCadastro();
-    document.getElementById('tabs').innerHTML = '';
-    return;
-  }
-  await BOOT.iniciarAposLogin();
-
-  sb.auth.onAuthStateChange((event)=>{
-    if (event === 'SIGNED_OUT'){ location.reload(); }
+  return null;
+}
+function parseLRC(lrc){
+  const out=[];
+  lrc.split('\n').forEach(line=>{
+    const stamps=[...line.matchAll(/\[(\d+):(\d+)(?:[.:](\d+))?\]/g)];
+    const text=line.replace(/\[[^\]]*\]/g,'').trim();
+    stamps.forEach(g=>{ const t=(+g[1])*60+(+g[2])+(g[3]?parseFloat('0.'+g[3]):0); out.push({t,text}); });
   });
-})();
+  return out.sort((a,b)=>a.t-b.t).filter(l=>l.text!=='');
+}
+async function gtx(text){
+  const u=`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=pt&dt=t&q=${encodeURIComponent(text)}`;
+  const r=await fetch(u); const j=await r.json();
+  return {lang:j[2]||'', text:(j[0]||[]).map(s=>s[0]).join('')};
+}
+async function translateLines(lines){
+  const chunks=[]; let cur=[],len=0;
+  for(const t of lines){ if(len+t.length+1>1300 && cur.length){ chunks.push(cur); cur=[]; len=0; } cur.push(t); len+=t.length+1; }
+  if(cur.length) chunks.push(cur);
+  let lang='', translated=[];
+  for(const ch of chunks){
+    try{
+      const res=await gtx(ch.join('\n'));
+      if(!lang) lang=res.lang;
+      let tl=res.text.split('\n');
+      while(tl.length<ch.length) tl.push('');
+      if(tl.length>ch.length) tl=tl.slice(0,ch.length);
+      translated=translated.concat(tl);
+    }catch(e){ translated=translated.concat(ch.map(()=>'')); }
+  }
+  return {lang, translated};
+}
+async function getLyrics(track){
+  if(lyr.cache[track.id]) return lyr.cache[track.id];
+  const raw=await lrclibGet(track);
+  let res;
+  const synced = raw && !!raw.syncedLyrics;
+  const lines = raw ? (synced ? parseLRC(raw.syncedLyrics)
+              : (raw.plainLyrics||'').split('\n').map(text=>({t:null,text})).filter(l=>l.text.trim()!=='')) : [];
+  if(!lines.length){ res={found:false}; }
+  else{
+    let translated=[], lang='', international=false;
+    try{ const tr=await translateLines(lines.map(l=>l.text)); lang=tr.lang; translated=tr.translated; international=!!(lang && lang!=='pt'); }catch(e){}
+    res={found:true, synced, lines, translated, international, lang};
+  }
+  lyr.cache[track.id]=res; return res;
+}
+function lineEls(arr){ return arr.map((txt,i)=>`<div class="line" data-i="${i}">${esc(txt)||'&nbsp;'}</div>`).join(''); }
+function renderLyrics(data){
+  const tbtn=$('transToggle');
+  if(!data.found){
+    $('lyricsBody').innerHTML=`<div class="lyrics-empty">
+      <svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+      <p>Letra não encontrada pra esta faixa.<br><small>Boa parte da música independente do Audius ainda não tem letra catalogada.</small></p></div>`;
+    tbtn.style.display='none'; return;
+  }
+  lyr.data=data; lyr.lastIdx=-1;
+  const plainCls=data.synced?'':'plain';
+  const orig=`<div class="pane orig ${plainCls}"><div class="plabel">Original${data.lang?' · '+data.lang.toUpperCase():''}</div>${lineEls(data.lines.map(l=>l.text))}</div>`;
+  if(data.international && lyr.showTrans){
+    const trans=`<div class="pane trans ${plainCls}"><div class="plabel">Português</div>${lineEls(data.translated)}</div>`;
+    $('lyricsBody').innerHTML=orig+trans;
+  } else {
+    $('lyricsBody').innerHTML=orig;
+  }
+  tbtn.style.display = data.international ? 'grid' : 'none';
+  tbtn.classList.toggle('on', lyr.showTrans);
+  updateLyricHighlight(true);
+}
+function updateLyricHighlight(force){
+  if(!lyr.open || !lyr.data || !lyr.data.synced) return;
+  const lines=lyr.data.lines, ct=audio.currentTime; let idx=-1;
+  for(let i=0;i<lines.length;i++){ if(lines[i].t<=ct) idx=i; else break; }
+  if(idx===lyr.lastIdx && !force) return;
+  lyr.lastIdx=idx;
+  document.querySelectorAll('#lyricsBody .pane').forEach(pane=>{
+    pane.querySelectorAll('.line.active').forEach(el=>el.classList.remove('active'));
+    const el=pane.querySelector(`.line[data-i="${idx}"]`);
+    if(el){ el.classList.add('active'); pane.scrollTop = el.offsetTop - pane.clientHeight/2 + el.clientHeight/2; }
+  });
+}
+function artistBg(t){
+  const u=t.user||{}, cp=u.cover_photo||{}, pp=u.profile_picture||{}, aw=t.artwork||{};
+  return cp['2000x']||cp['640x']||pp['1000x1000']||pp['480x480']||aw['1000x1000']||aw['480x480']||'';
+}
+async function openLyrics(reload){
+  const t=state.queue[state.index];
+  if(!t){ toast('Nada tocando'); return; }
+  lyr.open=true; $('lyrics').classList.add('show');
+  $('lyricsTitle').textContent=t.title; $('lyricsArtist').textContent=t.user?.name||'';
+  const bg=artistBg(t), bgEl=$('lyricsBg');
+  if(bg){ bgEl.style.backgroundImage=`url("${bg}")`; bgEl.classList.add('show'); }
+  else { bgEl.classList.remove('show'); bgEl.style.backgroundImage=''; }
+  if(!reload) $('lyricsBody').innerHTML=`<div class="spin" style="margin:auto"></div>`;
+  const data=await getLyrics(t);
+  if(state.queue[state.index] && state.queue[state.index].id===t.id) renderLyrics(data);
+}
+function closeLyrics(){ lyr.open=false; $('lyrics').classList.remove('show'); }
+
+$('lyricsClose').addEventListener('click',closeLyrics);
+$('transToggle').addEventListener('click',()=>{ lyr.showTrans=!lyr.showTrans; if(lyr.data) renderLyrics(lyr.data); });
+$('pmeta').addEventListener('click',()=>openLyrics(false));
+audio.addEventListener('timeupdate',()=>updateLyricHighlight(false));
+audio.addEventListener('loadstart',()=>{ lyr.lastIdx=-1; if(lyr.open) openLyrics(true); });
+
+/* ---------- init ---------- */
+(async function init(){ await discoverHost(); showHome(); })();
 </script>
+<script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}</script>
 </body>
 </html>

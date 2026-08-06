@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Frota</string>
-    <string name="title_activity_main">Frota</string>
-    <string name="package_name">br.com.frota.app</string>
-    <string name="custom_url_scheme">br.com.frota.app</string>
+    <string name="app_name">GiMusic</string>
+    <string name="title_activity_main">GiMusic</string>
+    <string name="package_name">com.gimusic.app</string>
+    <string name="custom_url_scheme">com.gimusic.app</string>
 </resources>

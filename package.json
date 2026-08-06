@@ -1,7 +1,7 @@
 {
-  "name": "frota-app",
+  "name": "gimusic-app",
   "version": "1.0.0",
-  "description": "Frota — Gestão de Frotas e Oficina (Capacitor Android wrapper)",
+  "description": "GiMusic — app de música (Capacitor Android wrapper)",
   "private": true,
   "scripts": {
     "sync": "cap sync android",

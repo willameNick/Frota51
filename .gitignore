@@ -9,7 +9,7 @@ android/app/build/
 android/capacitor-cordova-android-plugins/build/
 android/local.properties
 *.apk
-!Frota.apk
+!GiMusic.apk
 
 # Keystores / segredos de assinatura — NUNCA commitar
 *.keystore

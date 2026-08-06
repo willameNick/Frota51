@@ -1,13 +1,18 @@
 {
-  "name": "Frota — Gestão de Frotas e Oficina",
-  "short_name": "Frota",
-  "start_url": "./index.html",
+  "name": "GiMusic",
+  "short_name": "GiMusic",
+  "description": "Sua música, sem anúncios",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0b2545",
-  "theme_color": "#0b2545",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "lang": "pt-BR",
+  "categories": ["music", "entertainment"],
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
