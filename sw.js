@@ -1,5 +1,5 @@
 /* GiMusic service worker — app shell offline; áudio e APIs sempre pela rede */
-const CACHE = 'gimusic-v1';
+const CACHE = 'gimusic-v2';
 const SHELL = [
   './', './index.html', './manifest.json',
   './icon-192.png', './icon-512.png', './icon-maskable-512.png'
