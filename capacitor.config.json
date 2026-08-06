@@ -1,0 +1,8 @@
+{
+  "appId": "br.com.frota.app",
+  "appName": "Frota",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
