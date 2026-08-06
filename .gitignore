@@ -11,5 +11,11 @@ android/local.properties
 *.apk
 !Frota.apk
 
+# Keystores / segredos de assinatura — NUNCA commitar
+*.keystore
+*.jks
+*.keystore.b64
+keystore.properties
+
 # Misc
 .DS_Store
